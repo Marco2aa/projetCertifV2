@@ -7,6 +7,7 @@ import Carousel from './Carousel'
 const useStyles = makeStyles(() =>({
     banner:{
         backgroundImage : "url(./banner2.jpg)",
+        width:'100%'
     },
     bannerContent:{
         height:350,
@@ -34,7 +35,7 @@ const Banner = () => {
 
   return (
     <div className={classes.banner}>
-        <Container className={classes.bannerContent}>
+        <div className={classes.bannerContent}>
             <div className={classes.tagline}>
                 {/* <Typography
                 variant="h3"
@@ -50,7 +51,7 @@ const Banner = () => {
                 {/* </Typography> */}
             </div>
             <Carousel />
-        </Container>
+        </div>
     </div>
   )
 }

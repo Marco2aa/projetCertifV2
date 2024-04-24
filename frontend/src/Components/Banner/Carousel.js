@@ -61,7 +61,7 @@ const Carousel = () => {
             items:2,
         },
         512:{
-            items:4,
+            items:5,
         }
     }
 

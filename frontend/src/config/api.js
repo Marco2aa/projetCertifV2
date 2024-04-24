@@ -12,3 +12,7 @@ export const TrendingCoins = (currency) =>
 
 export const GetDataBaseCoins = (nbPage) =>
    `https://127.0.0.1:8000/api/cryptos?page=${nbPage}`
+
+
+
+
