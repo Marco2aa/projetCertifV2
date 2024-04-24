@@ -44,7 +44,7 @@ const CoinsTable = () => {
 
     useEffect(() => {
         if (devises && devises.length > 0) {
-            const newValue = devises.find((devise) => devise.nom === currency);
+            const newValue = devises.find((devise) => devise.name === currency);
             if (newValue) {
                 setValue(newValue.valeur);
                 console.log(newValue.valeur)

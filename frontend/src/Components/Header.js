@@ -84,7 +84,7 @@ const Header = () => {
               >
                 {console.log(devises)}
                 {devises.map((devise) => (
-                  <MenuItem key={devise.id} value={devise.nom}>{devise.nom}</MenuItem>
+                  <MenuItem key={devise.id} value={devise.name}>{devise.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
