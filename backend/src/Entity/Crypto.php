@@ -85,18 +85,22 @@ class Crypto
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $atl_date = null;
 
-    /**
-     * @var Collection<int, PriceData>
-     */
-    #[ORM\OneToMany(targetEntity: PriceData::class, mappedBy: 'crypto')]
-    private Collection $priceData;
+
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $idenitifiant = null;
 
+    /**
+     * @var Collection<int, Order>
+     */
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'crypto')]
+    private Collection $orders;
+
+
+
     public function __construct()
     {
-        $this->priceData = new ArrayCollection();
+        $this->orders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -368,35 +372,7 @@ class Crypto
         return $this;
     }
 
-    /**
-     * @return Collection<int, PriceData>
-     */
-    public function getPriceData(): Collection
-    {
-        return $this->priceData;
-    }
 
-    public function addPriceData(PriceData $priceData): static
-    {
-        if (!$this->priceData->contains($priceData)) {
-            $this->priceData->add($priceData);
-            $priceData->setCrypto($this);
-        }
-
-        return $this;
-    }
-
-    public function removePriceData(PriceData $priceData): static
-    {
-        if ($this->priceData->removeElement($priceData)) {
-            // set the owning side to null (unless already changed)
-            if ($priceData->getCrypto() === $this) {
-                $priceData->setCrypto(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getIdenitifiant(): ?string
     {
@@ -406,6 +382,36 @@ class Crypto
     public function setIdenitifiant(?string $idenitifiant): static
     {
         $this->idenitifiant = $idenitifiant;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Order $order): static
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders->add($order);
+            $order->setCrypto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Order $order): static
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getCrypto() === $this) {
+                $order->setCrypto(null);
+            }
+        }
 
         return $this;
     }

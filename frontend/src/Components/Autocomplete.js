@@ -2,8 +2,7 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box, Typography } from '@mui/material';
-import { Avatar } from '@material-ui/core';
-import { Height } from '@mui/icons-material';
+
 
 export default function AutocompleteHint({ options, label, id }) {
   const hint = React.useRef('');
@@ -17,7 +16,7 @@ export default function AutocompleteHint({ options, label, id }) {
         <li{...props}>
           < Box key={option.id} sx={{ display: 'flex', alignItems: 'center' }}>
             {option.image && (
-              <img src={option.image} style={{
+              <img src={option.image} alt={option.id} style={{
                 marginRight: 1,
                 height: 24,
                 width: 24
@@ -57,8 +56,8 @@ export default function AutocompleteHint({ options, label, id }) {
       sx={{ width: 300 }}
       ListboxProps={{
         style: {
-          maxHeight: 200, // Limite de la hauteur du menu déroulant à 200 pixels
-          overflowY: 'auto', // Ajoute un défilement vertical si nécessaire
+          maxHeight: 200,
+          overflowY: 'auto',
         },
       }}
       renderInput={(params) => {

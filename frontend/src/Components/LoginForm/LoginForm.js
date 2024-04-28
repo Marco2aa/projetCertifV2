@@ -72,7 +72,9 @@ function LoginForm() {
         localStorage.setItem('token', response.data.token)
         setIsAuthenticated(true)
         notifysucces()
-        // navigate('/')
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
       } catch (error) {
         setError('Invalid credentials. Please try again.');
         console.log('Invalid credentials. Please try again.');
@@ -135,7 +137,7 @@ function LoginForm() {
 
       <ToastContainer
         position="bottom-center"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

@@ -101,7 +101,7 @@ export default function DataTable() {
     const [tableData, setTableData] = React.useState([])
     const [loading, setLoading] = React.useState(false);
 
-    const fetchCategorie = React.useCallback(async () => {
+    const fetchCategorie = async () => {
         setLoading(true)
         try {
             let allCategories = [];
@@ -119,7 +119,7 @@ export default function DataTable() {
             setLoading(false)
 
         }
-    })
+    }
 
     React.useEffect(() => {
         fetchCategorie()
@@ -133,15 +133,16 @@ export default function DataTable() {
             width: '85%', display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            minHeight: '100vh',
+            // minHeight: '100vh',
             margin: 'auto',
             marginTop: '40px',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            fontFamily: 'Poppins'
 
         }}>
 
 
-            {loading && <LinearProgress style={{ width: '92%', position: 'relative', backgroundColor: 'orange' }} />}
+            {loading && <LinearProgress style={{ width: '100%', position: 'relative', backgroundColor: 'orange' }} />}
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -154,6 +155,7 @@ export default function DataTable() {
                 checkboxSelection
                 autoWidth
                 autoHeight
+                loading={rows.length === 0}
             />
 
 
