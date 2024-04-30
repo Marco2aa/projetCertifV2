@@ -90,9 +90,9 @@ function LoginForm() {
 
 
     <Box
-      height={550}
-      width={400}
-
+      // height={500}
+      width={500}
+      marginTop={10}
       display="flex"
       alignItems="center"
       gap={4}
@@ -106,7 +106,6 @@ function LoginForm() {
     >
       <Typography
         variant='h5'
-
         className={classes.title}>
         Connectez vous
       </Typography>

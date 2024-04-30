@@ -58,13 +58,18 @@ export default function BuyCrypto() {
     const [loading, setLoading] = useState(false);
     const [coins, setCoins] = useState([]);
     const [page, setPage] = useState(1);
-
-
-
+    const [pageTitle, setPageTitle] = useState('Achetez des Cryptos .');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
+        if (newValue === 0) {
+            setPageTitle('Achetez des  Cryptos.');
+        } else if (newValue === 1) {
+            setPageTitle('Vendez vos  Cryptos.');
+        }
     };
+
+
 
     const handleChangeIndex = (index) => {
         setValue(index);
@@ -132,7 +137,23 @@ export default function BuyCrypto() {
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "row",
-            gap: "30px"
+            gap: "20px"
+        },
+        fivecryptos: {
+            borderRadius: '8px',
+            border: 'solid 1px grey',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+            fontFamily: 'Poppins',
+            fontWeight: '500',
+            padding: '15px'
+
+        },
+        icon: {
+            height: '20px',
+            width: '20px'
         }
 
     }))
@@ -143,46 +164,132 @@ export default function BuyCrypto() {
 
     return (
         <Box sx={{
-            bgcolor: 'background.paper',
-            width: 600, borderRadius: 5,
-            overflow: "hidden",
-            marginTop: 15
-        }} >
-            <AppBar position="static"
-                sx={{
-                    borderTopRightRadius: '8px',
-                    borderTopLeftRadius: '8px'
-                }}>
-                <Tabs
-                    value={value}
-                    onChange={handleChange}
-                    textColor="inherit"
-                    variant="fullWidth"
-                    aria-label="full width tabs example"
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '300px',
+            justifyContent: 'space-evenly',
+            width: '100%',
+            marginTop: 5
+        }}>
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '60px' }}>
+                <Typography fontWeight={700} variant="h2">{pageTitle}</Typography>
+                <Typography>Pris en charge :
+
+                </Typography>
+                <div className={classes.fivecryptos}>
+                    <p style={{ marginLeft: '15px', fontWeight: 500 }}>Cryptos populaires</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {coins.slice(0, 5).map((coin) => (
+                            <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'space-between' }}>
+                                <div style={{ marginLeft: '15px', display: 'flex', flexDirection: 'row', gap: '15px' }}>
+                                    <img className={classes.icon} src={coin.image} />
+                                    <p>{coin.symbol.toUpperCase()}</p>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'row', marginRight: '15px', gap: '65px' }}>
+                                    <p>{coin.currentPrice}</p>
+                                    <p style={{
+                                        color: coin.price_change_percentage_24h > 0 ? "rgb(14, 203, 129)" : "red"
+                                    }}>{coin.price_change_percentage_24h} %</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                </div>
+            </Box>
+            <Box sx={{
+                bgcolor: 'background.paper',
+                width: '100%',
+                borderRadius: 5,
+                overflow: "hidden",
+            }} >
+                <AppBar position="static"
+
                     sx={{
-                        '& .MuiTabs-indicator': {
-                            backgroundColor: '#FFA500',
-                        },
-                        // '& .MuiTab-root': {
-                        //     borderRadius: '10px', 
-                    }}
+                        borderTopRightRadius: '8px',
+                        borderTopLeftRadius: '8px',
+                        width: '100%'
+                    }}>
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        textColor="inherit"
+                        variant="fullWidth"
+                        aria-label="full width tabs example"
+                        sx={{
+                            '& .MuiTabs-indicator': {
+                                backgroundColor: '#FFA500',
+                            },
+                        }}
+                    >
+                        <Tab label="Acheter" {...a11yProps(0)} />
+                        <Tab label="Vendre" {...a11yProps(1)} />
+                    </Tabs>
+                </AppBar>
+                <SwipeableViews
+                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                    index={value}
+                    onChangeIndex={handleChangeIndex}
                 >
-                    <Tab label="Acheter" {...a11yProps(0)} />
-                    <Tab label="Vendre" {...a11yProps(1)} />
-                </Tabs>
-            </AppBar>
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                onChangeIndex={handleChangeIndex}
-            >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <form
-                        className={classes.form}>
+                    <TabPanel value={value} index={0} dir={theme.direction}>
+                        <form
+                            className={classes.form}>
 
-                        <div className={classes.div}>
-                            <div className={classes.fields}>
+                            <div className={classes.div}>
+                                <div className={classes.fields}>
 
+                                    <TextField
+                                        fullWidth
+                                        color='warning'
+                                        label="Depenser"
+                                        placeholder='Saisissez un montant'
+                                        type="email"
+                                    />
+                                    <AutocompleteHint
+                                        options={coins}
+                                        label="Cryptos"
+                                        id="1"
+                                    />
+                                    {console.log(coins)}
+                                </div>
+                                <div className={classes.fields}>
+                                    <TextField
+                                        fullWidth
+                                        color='warning'
+                                        label="Recevoir"
+                                        placeholder='0.00'
+                                        type="password"
+
+                                    />
+                                    <AutocompleteHint
+                                        options={devises}
+                                        label="Devises"
+                                        id="2"
+                                    />
+                                </div>
+                            </div>
+                            <Slider
+                                aria-label="Temperature"
+                                defaultValue={30}
+                                color='warning'
+                                // getAriaValueText={valuetext}
+                                valueLabelDisplay="auto"
+                                shiftStep={30}
+                                step={10}
+                                marks
+                                min={0}
+                                max={100}
+                            />
+                            <button
+                                className={classes.button}
+                                type="sumbit">Recevoir</button>
+                        </form>
+                    </TabPanel>
+                    <TabPanel value={value} index={1} dir={theme.direction}>
+                        <form
+                            className={classes.form}>
+
+                            <div className={classes.div}>
                                 <TextField
                                     fullWidth
                                     color='warning'
@@ -190,14 +297,6 @@ export default function BuyCrypto() {
                                     placeholder='Saisissez un montant'
                                     type="email"
                                 />
-                                <AutocompleteHint
-                                    options={coins}
-                                    label="Cryptos"
-                                    id="1"
-                                />
-                                {console.log(coins)}
-                            </div>
-                            <div className={classes.fields}>
                                 <TextField
                                     fullWidth
                                     color='warning'
@@ -206,56 +305,14 @@ export default function BuyCrypto() {
                                     type="password"
 
                                 />
-                                <AutocompleteHint
-                                    options={devises}
-                                    label="Devises"
-                                    id="2"
-                                />
                             </div>
-                        </div>
-                        <Slider
-                            aria-label="Temperature"
-                            defaultValue={30}
-                            // getAriaValueText={valuetext}
-                            valueLabelDisplay="auto"
-                            shiftStep={30}
-                            step={10}
-                            marks
-                            min={10}
-                            max={110}
-                        />
-                        <button
-                            className={classes.button}
-                            type="sumbit">Recevoir</button>
-                    </form>
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                    <form
-                        className={classes.form}>
-
-                        <div className={classes.div}>
-                            <TextField
-                                fullWidth
-                                color='warning'
-                                label="Depenser"
-                                placeholder='Saisissez un montant'
-                                type="email"
-                            />
-                            <TextField
-                                fullWidth
-                                color='warning'
-                                label="Recevoir"
-                                placeholder='0.00'
-                                type="password"
-
-                            />
-                        </div>
-                        <button
-                            className={classes.button}
-                            type="sumbit">Recevoir</button>
-                    </form>
-                </TabPanel>
-            </SwipeableViews>
-        </ Box >
+                            <button
+                                className={classes.button}
+                                type="sumbit">Recevoir</button>
+                        </form>
+                    </TabPanel>
+                </SwipeableViews>
+            </ Box >
+        </Box>
     );
 }

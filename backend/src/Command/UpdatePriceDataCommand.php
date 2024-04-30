@@ -35,47 +35,47 @@ class UpdatePriceDataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->entityManager->createQuery('DELETE FROM App\Entity\PriceData')->execute();
-        
+
         $response = $this->httpClient->request(
             'GET',
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=EUR&order=market_cap_desc&per_page=30&page=1&sparkline=false'
         );
         $cryptos = $response->toArray();
 
-        $periods = [1,7, 30, 90];
+        $periods = [1, 7, 30, 90];
         $count1 = 0;
         $count = 0;
-        foreach($periods as $period){
+        foreach ($periods as $period) {
             foreach ($cryptos as $cryptoData) {
-                
+
                 $crypto = $this->entityManager->getRepository(Crypto::class)->findOneBy(['name' => $cryptoData['name']]);
-                
+
                 $response = $this->httpClient->request(
                     'GET',
-                    'https://api.coingecko.com/api/v3/coins/'.strtolower($cryptoData['id']).'/market_chart?vs_currency=EUR&days='.$period
+                    'https://api.coingecko.com/api/v3/coins/' . strtolower($cryptoData['id']) . '/market_chart?vs_currency=EUR&days=' . $periods,
+
                 );
-                $count +=1 ;
-                $output->writeln('request_done'.$count);
+                $count += 1;
+                $output->writeln('request_done' . $count);
                 $price_data = $response->toArray();
                 foreach ($price_data['prices'] as $data) {
                     $priceEntity = new PriceData();
-                    $priceEntity->setTimestamp(new \DateTime('@'.$data[0] / 1000));
-                    $priceEntity->setPrice($data[1]);
+                    $priceEntity->setTimestamp(new \DateTime('@' . $data[0] / 1000));
                     $priceEntity->setGranularity($period);
                     $priceEntity->setCrypto($crypto);
                     $this->entityManager->persist($priceEntity);
                     $count1 += 1;
-                    $output->writeln('price added'.$count1);
+                    $output->writeln('price added' . $count1);
                     $this->entityManager->flush();
                 }
                 usleep(20000000); //Permet de contourner ma limite de 30 appels/minutes.
-                
 
-                
+
+
             }
         }
-            
-        
+
+
 
 
         $output->writeln('Crypto data updated successfully.');

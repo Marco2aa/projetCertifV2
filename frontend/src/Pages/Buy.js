@@ -1,6 +1,7 @@
 import React from 'react'
 
 import BuyCrypto from '../Components/BuyCrypto/BuyCrypto'
+import CustomizedTabs from '../Components/StyledTabs'
 
 const Buy = () => {
     return (
@@ -12,7 +13,8 @@ const Buy = () => {
             width: "100%"
         }}
         >
-            <BuyCrypto />
+            <CustomizedTabs />
+            {/* <BuyCrypto /> */}
             {/* <BuyLayout>
                 <SellForm />
             </BuyLayout> */}

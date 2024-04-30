@@ -9,11 +9,15 @@ import Categorie from "./Pages/Categorie.js";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Buy from "./Pages/Buy.js";
+import Transaction from "./Pages/Transaction.js";
+import Dashboard from "./Pages/Dashboard.js";
+
 
 const AppContainer = styled('div')({
-  backgroundColor: "rgb(28, 28, 28)",
+  backgroundColor: "#181A20",
   color: 'white',
   minHeight: '100vh',
+  minWidth: '100%'
 });
 
 const darkTheme = createTheme({
@@ -34,6 +38,8 @@ function App() {
             <Route path='/coins/:id' element={<CoinPage />} />
             <Route path='/login' element={<Login />} />
             <Route path='/buy' element={<Buy />} />
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/dashboard' element={<Transaction />} />
           </Routes>
         </AppContainer>
       </BrowserRouter>

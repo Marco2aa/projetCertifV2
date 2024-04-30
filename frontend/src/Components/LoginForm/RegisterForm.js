@@ -8,6 +8,7 @@ import { Typography } from '@material-ui/core';
 import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import './RegisterForm.css'
 
 function RegisterForm() {
     const [email, setEmail] = useState('');
@@ -22,18 +23,17 @@ function RegisterForm() {
 
 
     const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+    const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 
-    const emailRef = useRef();
-    const errRef = useRef();
 
-    const [validEmail, setValidEmail] = useState(false);
-    const [emailFocus, setEmailFocus] = useState(false);
+
     const [validPwd, setValidPwd] = useState(false);
-    const [pwdFocus, setPwdFocus] = useState(false);
     const [validMatch, setValidMatch] = useState(false);
-    const [matchFocus, setMatchFocus] = useState(false);
-    const [errMsg, setErrMsg] = useState('');
-    const [success, setSuccess] = useState(false);
+    const [validEmail, setValidEmail] = useState(false);
+    const [emailFocus, setEmailFocus] = useState(false)
+    const [passwordFocus, setPasswordFocus] = useState(false);
+    const [validMatchFocus, setValidMatchFocus] = useState(false)
+
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -42,21 +42,18 @@ function RegisterForm() {
     };
 
     useEffect(() => {
-        emailRef.current.focus();
-    }, [])
-
-    useEffect(() => {
-        setValidEmail(email);
+        const isValidEmail = EMAIL_REGEX.test(email);
+        setValidEmail(isValidEmail);
     }, [email])
+
+
 
     useEffect(() => {
         setValidPwd(PWD_REGEX.test(password));
-        setValidMatch(password === confirmPassword);
-    }, [pwd, matchPwd])
+        setValidMatch(password === passwordConfirm);
+    }, [password, passwordConfirm])
 
-    useEffect(() => {
-        setErrMsg('');
-    }, [user, pwd, matchPwd])
+
 
 
 
@@ -71,9 +68,6 @@ function RegisterForm() {
         title: {
             fontFamily: "Poppins",
             fontWeight: "700",
-            // marginBottom: "0px"
-
-
         },
         form: {
             display: "flex",
@@ -82,7 +76,6 @@ function RegisterForm() {
             width: "100%",
             marginBottom: "10px"
         },
-
         button: {
             height: "55px",
             backgroundColor: "orange",
@@ -101,7 +94,7 @@ function RegisterForm() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        if (password === passwordConfirm) {
+        if (validPwd === validMatch) {
             try {
                 const response = await axios.post('https://localhost:8000/api/register', {
                     email,
@@ -124,9 +117,7 @@ function RegisterForm() {
 
 
         <Box
-            // height={650}
-            // width={450}
-
+            width='500px'
             display="flex"
             alignItems="center"
             gap={4}
@@ -147,14 +138,39 @@ function RegisterForm() {
             <form
                 className={classes.form}
                 onSubmit={handleRegister}>
-                <TextField
+                {/* <TextField
                     fullWidth
                     color='warning'
                     label="Email"
                     value={email}
                     type="email"
                     onChange={(e) => setEmail(e.target.value)}
-                />
+
+                /> */}
+                <FormControl variant="outlined">
+
+                    <InputLabel color='warning' htmlFor="outlined-adornment-password">Email</InputLabel>
+                    <OutlinedInput
+                        id="outlined-adornment-password"
+                        type="email"
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <FontAwesomeIcon icon={faCheck} className={validEmail ? "valid" : "hide"} />
+                                <FontAwesomeIcon icon={faTimes} className={validEmail || !email ? "hide" : "invalid"} />
+                            </InputAdornment>
+                        }
+                        label="Email"
+                        color='warning'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onFocus={() => setEmailFocus(true)}
+                        onBlur={() => setEmailFocus(false)}
+                    />
+                    <p id="uidnote" className={emailFocus && email && !validEmail ? "instructions" : "offscreen"}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                        Please , enter a valid Email.
+                    </p>
+                </FormControl>
                 <TextField
                     fullWidth
                     color='warning'
@@ -186,14 +202,23 @@ function RegisterForm() {
                                 >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
-                                <FontAwesomeIcon icon={faCheck} />
+                                <FontAwesomeIcon icon={faCheck} className={validPwd ? "valid" : "hide"} />
+                                <FontAwesomeIcon icon={faTimes} className={validPwd || !password ? "hide" : "invalid"} />
                             </InputAdornment>
                         }
                         label="Mot de passe"
                         color='warning'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onFocus={() => setPasswordFocus(true)}
+                        onBlur={() => setPasswordFocus(false)}
                     />
+                    <p id="pwdnote" className={passwordFocus && !validPwd ? "instructions" : "offscreen"}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                        8 to 24 characters.<br />
+                        Must include uppercase and lowercase letters, a number and a special character.<br />
+                        Allowed special characters: <span aria-label="exclamation mark">!</span> <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span> <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
+                    </p>
                 </FormControl>
                 <FormControl variant="outlined">
                     <InputLabel color='warning' htmlFor="outlined-adornment-password">Confirmez le mot de passe</InputLabel>
@@ -201,7 +226,7 @@ function RegisterForm() {
                         id="outlined-adornment-password"
                         type={showPassword ? 'text' : 'password'}
                         endAdornment={
-                            <InputAdornment position="end">
+                            <InputAdornment style={{ display: 'flex', gap: '10px' }} f position="end">
                                 <IconButton
                                     aria-label="toggle password visibility"
                                     onClick={handleClickShowPassword}
@@ -210,32 +235,23 @@ function RegisterForm() {
                                 >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
+                                <FontAwesomeIcon icon={faCheck} className={validMatch && passwordConfirm ? "valid" : "hide"} />
+                                <FontAwesomeIcon icon={faTimes} className={validMatch || !passwordConfirm ? "hide" : "invalid"} />
                             </InputAdornment>
                         }
                         label="Confirmez le mot de passe"
                         color='warning'
                         value={passwordConfirm}
                         onChange={(e) => setPasswordConfirm(e.target.value)}
-                    />
-                </FormControl>
-                <TextField
-                    fullWidth
-                    color='warning'
-                    label="Mot de passe"
-                    value={password}
-                    type="password"
-                    onChange={(e) => setPasswordConfirm(e.target.value)}
-                />
-                <OutlinedInput
-                    fullWidth
-                    color='warning'
-                    label="Confirmez le mot de passe"
-                    placeholder='Confirmez le mot de passe'
-                    value={passwordConfirm}
-                    type='password'
-                    onChange={(e) => setPasswordConfirm(e.target.value)}
-                />
+                        onFocus={() => setValidMatchFocus(true)}
+                        onBlur={() => setValidMatchFocus(false)}
 
+                    />
+                    <p id="confirmnote" className={validMatchFocus && !validMatch ? "instructions" : "offscreen"}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                        Must match the first password input field.
+                    </p>
+                </FormControl>
 
                 <button
                     className={classes.button}

@@ -23,13 +23,14 @@ const CoinInfo = ({ coin }) => {
 
   const matchesMD = useMediaQuery(theme.breakpoints.down('md'));
 
-  const fetchHistoricData = async () => {
-    const { data } = await axios.get(HistoricalChart(coin.id, days, currency));
+  const fetchHistoricData = async (id, days, currency) => {
+    const { data } = await axios.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=${days}&x_cg_demo_api_key=CG-gDHAm9CSTV5ATdZaHa7Xx7JS`)
     setHistoricalData(data.prices);
+    console.log(data.prices)
   };
 
   useEffect(() => {
-    fetchHistoricData();
+    fetchHistoricData(coin.id, days, currency);
   }, [currency, days]);
 
   // const darkTheme = createTheme({

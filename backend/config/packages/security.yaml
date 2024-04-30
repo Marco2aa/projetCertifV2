@@ -11,6 +11,7 @@ security:
                 class: App\Entity\User
                 property: email
         
+ 
 
     firewalls:
         dev:
@@ -30,6 +31,7 @@ security:
             stateless: true
             lazy: true
             jwt: ~
+            
 
     
                 
