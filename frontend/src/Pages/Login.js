@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import LoginForm from '../Components/LoginForm/LoginForm';
-import Header from '../Components/Header';
+import LoginForm from '../Components/LoginForm';
 import FormLayout from '../Components/FormLayout';
-import RegisterForm from '../Components/LoginForm/RegisterForm';
+import RegisterForm from '../Components/RegisterForm/RegisterForm';
 import { Link } from 'react-router-dom';
 
 const Login = () => {

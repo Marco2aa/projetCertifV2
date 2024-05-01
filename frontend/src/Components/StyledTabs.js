@@ -3,8 +3,10 @@ import { styled } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import BuyCrypto from './BuyCrypto/BuyCrypto';
+import BuyCrypto from './BuyCrypto';
 import { BorderBottom } from '@mui/icons-material';
+import Withdrawal from './Withdrawal';
+import Deposit from './Deposit';
 
 
 
@@ -70,7 +72,9 @@ export default function CustomizedTabs() {
                     <StyledTab label="Retrait" />
                 </StyledTabs>
                 {/* <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}> */}
-                <BuyCrypto />
+                {value === 0 && <BuyCrypto />} {/* Afficher BuyCrypto lorsque l'onglet Achat et vente est sélectionné */}
+                {value === 1 && <Deposit />} {/* Afficher DepositComponent lorsque l'onglet Dépôt est sélectionné */}
+                {value === 2 && <Withdrawal />}
                 {/* </div> */}
 
             </Box>

@@ -3,18 +3,19 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box, Typography } from '@mui/material';
 
+export default function AutocompleteHint({ options, label, id, onChange }) {
+  const [value, setValue] = React.useState(null);
 
-export default function AutocompleteHint({ options, label, id }) {
-  const hint = React.useRef('');
-  const [inputValue, setInputValue] = React.useState('');
+  const handleAutocompleteChange = (event, newValue) => {
+    setValue(newValue);
+    onChange(newValue);
+  }
   return (
-
-    < Autocomplete
+    <Autocomplete
       getOptionLabel={(option) => option.name.toUpperCase()}
-
       renderOption={(props, option) => (
-        <li{...props}>
-          < Box key={option.id} sx={{ display: 'flex', alignItems: 'center' }}>
+        <li {...props}>
+          <Box key={option.id} sx={{ display: 'flex', alignItems: 'center' }}>
             {option.image && (
               <img src={option.image} alt={option.id} style={{
                 marginRight: 1,
@@ -25,35 +26,18 @@ export default function AutocompleteHint({ options, label, id }) {
             {option.name.toUpperCase()}
           </Box>
         </li>
-      )
-      }
-
-      onKeyDown={(event) => {
-        if (event.key === 'Tab') {
-          if (hint.current) {
-            setInputValue(hint.current);
-            event.preventDefault();
-          }
-        }
-      }}
-      onBlur={() => {
-        hint.current = '';
-      }}
-      disablePortal
-      inputValue={inputValue}
+      )}
+      value={value}
+      onChange={handleAutocompleteChange}
       filterOptions={(options, state) => {
         const displayOptions = options.filter((option) =>
-          option.name
-            .toLowerCase()
-            .trim()
-            .includes(state.inputValue.toLowerCase().trim()),
+          option.name.toLowerCase().trim().includes(state.inputValue.toLowerCase().trim()),
         );
-
         return displayOptions;
       }}
       id={id}
       options={options}
-      sx={{ width: 300 }}
+      sx={{ width: '70%' }}
       ListboxProps={{
         style: {
           maxHeight: 200,
@@ -63,34 +47,13 @@ export default function AutocompleteHint({ options, label, id }) {
       renderInput={(params) => {
         return (
           <Box sx={{ position: 'relative' }}>
-            <Typography
-              sx={{ position: 'absolute', opacity: 0.5, left: 14, top: 16 }}
-            >
-              {hint.current}
-            </Typography>
             <TextField
               {...params}
-              onChange={(e) => {
-                const newValue = e.target.value;
-                setInputValue(newValue);
-                const matchingOption = options.find((option) =>
-                  option.name.startsWith(newValue),
-                );
-
-                if (newValue && matchingOption) {
-                  hint.current = matchingOption.name;
-                } else {
-                  hint.current = '';
-                }
-              }}
               label={label}
             />
-            {console.log(options)}
-            {console.log(inputValue)}
           </Box>
         );
       }}
     />
   );
 }
-

@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import { AccountBalanceIcon } from '@mui/icons-material/AccountBalance';
 import { yellow } from '@material-ui/core/colors'
 import { Mosque, WidthFull, Synagogue } from '@mui/icons-material'
-import UserDisplay from './UserDisplay/UserDisplay.js'
+import UserDisplay from './UserDisplay.js'
 
 const useStyles = makeStyles(() => ({
   title: {

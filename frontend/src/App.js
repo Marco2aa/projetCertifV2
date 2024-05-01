@@ -39,7 +39,7 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/buy' element={<Buy />} />
             <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/dashboard' element={<Transaction />} />
+            <Route path='/transaction' element={<Transaction />} />
           </Routes>
         </AppContainer>
       </BrowserRouter>

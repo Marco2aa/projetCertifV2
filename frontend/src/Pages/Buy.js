@@ -1,6 +1,4 @@
 import React from 'react'
-
-import BuyCrypto from '../Components/BuyCrypto/BuyCrypto'
 import CustomizedTabs from '../Components/StyledTabs'
 
 const Buy = () => {
@@ -14,10 +12,7 @@ const Buy = () => {
         }}
         >
             <CustomizedTabs />
-            {/* <BuyCrypto /> */}
-            {/* <BuyLayout>
-                <SellForm />
-            </BuyLayout> */}
+
 
         </div>
     )

@@ -9,11 +9,10 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Autocomplete, Slider, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import SelectCrypto from '../Autocomplete';
-import AutocompleteHint from '../Autocomplete';
+import AutocompleteHint from './Autocomplete';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
-import { CryptoState } from '../../CryptoContext';
+import { CryptoState } from '../CryptoContext';
 
 
 function TabPanel(props) {
@@ -28,7 +27,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box sx={{ p: 3 }}>
+                <Box sx={{ p: 3, backgroundColor: 'transparent' }}>
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -59,6 +58,23 @@ export default function BuyCrypto() {
     const [coins, setCoins] = useState([]);
     const [page, setPage] = useState(1);
     const [pageTitle, setPageTitle] = useState('Achetez des Cryptos .');
+    const [selectedPercentage, setSelectedPercentage] = useState(0);
+    const [amount, setAmount] = useState(0);
+    const [solde, setSolde] = useState(0)
+
+
+    const calculateAmount = (percentage) => {
+        const walletBalance = solde;
+        const calculatedAmount = (percentage / 100) * walletBalance;
+        return calculatedAmount.toFixed(2);
+    };
+
+
+    const handlePercentageChange = (event, newValue) => {
+        setSelectedPercentage(newValue);
+        const newAmount = calculateAmount(newValue);
+        setAmount(newAmount);
+    };
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -98,6 +114,28 @@ export default function BuyCrypto() {
         fetchCoins();
     }, [fetchCoins]);
 
+    useEffect(() => {
+        fetchWallet()
+    }, [])
+
+    const fetchWallet = async () => {
+        try {
+            const token = localStorage.getItem('token')
+            console.log(token)
+            const response = await axios.get('https://localhost:8000/api/walletuser', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json'
+                }
+            })
+            console.log(response.data)
+            setSolde(response.data[0].solde)
+        } catch (error) {
+            console.error('erreur lors de la recuperation du portefeuille :', error)
+        }
+
+    }
+
 
     const useStyles = makeStyles(() => ({
         title: {
@@ -109,10 +147,10 @@ export default function BuyCrypto() {
         },
         form: {
             display: "flex",
-            gap: "100px",
+            gap: "60px",
             flexDirection: "column",
             width: "100%",
-            marginBottom: "10px"
+            marginBottom: "10px",
         },
 
         button: {
@@ -166,10 +204,10 @@ export default function BuyCrypto() {
         <Box sx={{
             display: 'flex',
             flexDirection: 'row',
-            gap: '300px',
+            gap: '250px',
             justifyContent: 'space-evenly',
             width: '100%',
-            marginTop: 5
+            marginTop: 5,
         }}>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '60px' }}>
                 <Typography fontWeight={700} variant="h2">{pageTitle}</Typography>
@@ -198,17 +236,18 @@ export default function BuyCrypto() {
                 </div>
             </Box>
             <Box sx={{
-                bgcolor: 'background.paper',
+                bgcolor: 'transparent',
                 width: '100%',
                 borderRadius: 5,
-                overflow: "hidden",
+                // overflow: "hidden",
+                border: '1px solid grey'
             }} >
-                <AppBar position="static"
+                <AppBar color='transparent' position="static"
 
                     sx={{
                         borderTopRightRadius: '8px',
                         borderTopLeftRadius: '8px',
-                        width: '100%'
+                        width: '100%',
                     }}>
                     <Tabs
                         value={value}
@@ -231,7 +270,11 @@ export default function BuyCrypto() {
                     index={value}
                     onChangeIndex={handleChangeIndex}
                 >
-                    <TabPanel value={value} index={0} dir={theme.direction}>
+                    <TabPanel sx={{
+                        '& .MuiTabPanel-root': {
+                            backgroundColor: 'transparent'
+                        }
+                    }} value={value} index={0} dir={theme.direction}>
                         <form
                             className={classes.form}>
 
@@ -243,7 +286,7 @@ export default function BuyCrypto() {
                                         color='warning'
                                         label="Depenser"
                                         placeholder='Saisissez un montant'
-                                        type="email"
+                                        type="text"
                                     />
                                     <AutocompleteHint
                                         options={coins}
@@ -258,7 +301,7 @@ export default function BuyCrypto() {
                                         color='warning'
                                         label="Recevoir"
                                         placeholder='0.00'
-                                        type="password"
+                                        type="text"
 
                                     />
                                     <AutocompleteHint
@@ -269,6 +312,8 @@ export default function BuyCrypto() {
                                 </div>
                             </div>
                             <Slider
+                                value={selectedPercentage}
+                                onChange={handlePercentageChange}
                                 aria-label="Temperature"
                                 defaultValue={30}
                                 color='warning'
@@ -280,6 +325,9 @@ export default function BuyCrypto() {
                                 min={0}
                                 max={100}
                             />
+                            <Typography>
+                                Montant sélectionné: {amount}
+                            </Typography>
                             <button
                                 className={classes.button}
                                 type="sumbit">Recevoir</button>
@@ -295,14 +343,14 @@ export default function BuyCrypto() {
                                     color='warning'
                                     label="Depenser"
                                     placeholder='Saisissez un montant'
-                                    type="email"
+                                    type="text"
                                 />
                                 <TextField
                                     fullWidth
                                     color='warning'
                                     label="Recevoir"
                                     placeholder='0.00'
-                                    type="password"
+                                    type="text"
 
                                 />
                             </div>

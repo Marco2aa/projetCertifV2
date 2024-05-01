@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import './UserDisplay.css'
 import { useNavigate } from 'react-router';
 
 export default function UserDisplay() {

@@ -29,4 +29,20 @@ class WalletService
 
         return $wallet;
     }
+
+    public function updateWalletSolde(User $user, string $walletName, float $newSolde): void
+    {
+        $wallet = null;
+        foreach ($user->getWallets() as $userWallet) {
+            if ($userWallet->getName() === $walletName) {
+                $wallet = $userWallet;
+                break;
+            }
+        }
+        if (!$wallet) {
+            throw new \InvalidArgumentException('Portefeuille non trouvé pour le nom spécifié');
+        }
+        $wallet->setSolde($newSolde);
+        $this->entityManager->flush();
+    }
 }
