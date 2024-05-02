@@ -42,6 +42,10 @@ class WalletService
         if (!$wallet) {
             throw new \InvalidArgumentException('Portefeuille non trouvé pour le nom spécifié');
         }
+
+        $oldSolde = $wallet->getSolde(); // Récupération de l'ancien solde
+        $newSolde = $newSolde + $oldSolde; // Calcul du nouveau solde
+
         $wallet->setSolde($newSolde);
         $this->entityManager->flush();
     }

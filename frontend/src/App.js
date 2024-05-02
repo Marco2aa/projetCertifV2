@@ -31,7 +31,6 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <BrowserRouter>
         <AppContainer>
-          <Header />
           <Routes>
             <Route path='/categories' element={<Categorie />} />
             <Route path='/' element={<Homepage />} />

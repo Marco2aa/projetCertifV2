@@ -3,6 +3,7 @@ import LoginForm from '../Components/LoginForm';
 import FormLayout from '../Components/FormLayout';
 import RegisterForm from '../Components/RegisterForm/RegisterForm';
 import { Link } from 'react-router-dom';
+import Header from '../Components/Header';
 
 const Login = () => {
   const [register, setRegister] = useState(false);
@@ -15,6 +16,7 @@ const Login = () => {
 
   return (
     <div>
+      <Header />
       <FormLayout>
         {register ? (
           <>

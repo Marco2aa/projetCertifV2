@@ -13,6 +13,10 @@ import AutocompleteHint from './Autocomplete';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { CryptoState } from '../CryptoContext';
+import SelectWallet from './SelectWallet';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './RegisterForm/RegisterForm.css'
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 
 function TabPanel(props) {
@@ -61,6 +65,13 @@ export default function BuyCrypto() {
     const [selectedPercentage, setSelectedPercentage] = useState(0);
     const [amount, setAmount] = useState(0);
     const [solde, setSolde] = useState(0)
+    const [selectedValue, setSelectedValue] = useState(null);
+    const [wallet, setWallet] = useState([])
+    const [selectedWallet, setSelectedWallet] = useState('')
+    const [error, setError] = useState(false)
+
+    const thisWallet = wallet.find(item => item.name === selectedWallet)
+    console.log(thisWallet);
 
 
     const calculateAmount = (percentage) => {
@@ -130,6 +141,7 @@ export default function BuyCrypto() {
             })
             console.log(response.data)
             setSolde(response.data[0].solde)
+            setWallet(response.data)
         } catch (error) {
             console.error('erreur lors de la recuperation du portefeuille :', error)
         }
@@ -147,10 +159,11 @@ export default function BuyCrypto() {
         },
         form: {
             display: "flex",
-            gap: "60px",
+            gap: "20px",
             flexDirection: "column",
             width: "100%",
-            marginBottom: "10px",
+            marginTop: "5px",
+            marginBottom: '5px'
         },
 
         button: {
@@ -161,13 +174,14 @@ export default function BuyCrypto() {
             cursor: "pointer",
             fontSize: "1.2em",
             fontWeight: "500",
-            width: "100%"
+            width: "100%",
+            // marginTop: '10px'
         },
         div: {
             display: "flex",
             width: "100%",
             flexDirection: "column",
-            gap: "30px"
+            gap: "10px"
         },
         fields: {
 
@@ -175,7 +189,7 @@ export default function BuyCrypto() {
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "row",
-            gap: "20px"
+            gap: "10px"
         },
         fivecryptos: {
             borderRadius: '8px',
@@ -198,7 +212,28 @@ export default function BuyCrypto() {
 
     const classes = useStyles()
 
+    const handleSelectedValueChange = (newValue) => {
+        setSelectedValue(newValue);
+    }
 
+    const handleSelectWallet = (selectedValue) => {
+        console.log("Wallet selected:", selectedValue);
+        setSelectedWallet(selectedValue)
+    }
+
+    const handleAmountChange = (e) => {
+        const inputValue = e.target.value;
+        if (inputValue === '') {
+            setError(false);
+            setAmount(inputValue) // Réinitialise l'erreur si l'utilisateur efface le contenu
+        } else if (parseFloat(inputValue) <= solde) {
+            setAmount(inputValue);
+            setError(false); // Réinitialise l'erreur si la valeur saisie est valide
+        } else {
+            setAmount(solde.toString()); // Remplace la valeur saisie par le solde
+            setError(true); // Définit l'erreur sur true si la valeur saisie dépasse le solde
+        }
+    };
 
     return (
         <Box sx={{
@@ -238,6 +273,7 @@ export default function BuyCrypto() {
             <Box sx={{
                 bgcolor: 'transparent',
                 width: '100%',
+                height: '100%',
                 borderRadius: 5,
                 // overflow: "hidden",
                 border: '1px solid grey'
@@ -277,21 +313,36 @@ export default function BuyCrypto() {
                     }} value={value} index={0} dir={theme.direction}>
                         <form
                             className={classes.form}>
+                            <SelectWallet wallets={wallet} onSelect={handleSelectWallet} />
 
                             <div className={classes.div}>
                                 <div className={classes.fields}>
+                                    <div style={{ width: '100%' }}>
 
-                                    <TextField
-                                        fullWidth
-                                        color='warning'
-                                        label="Depenser"
-                                        placeholder='Saisissez un montant'
-                                        type="text"
-                                    />
+                                        <TextField
+                                            fullWidth
+                                            color='warning'
+                                            label="Depenser"
+                                            placeholder={`0.00 - ${solde.toFixed(2)}`}
+                                            type="text"
+                                            value={amount}
+                                            onChange={handleAmountChange}
+                                        />
+                                        {error && (
+                                            <p id="pwdnote" className={error ? "instructions" : "offscreen"}>
+                                                <FontAwesomeIcon icon={faInfoCircle} />
+                                                Le montant dépasse le solde maximum autorisé.
+                                            </p>
+                                        )}
+
+                                    </div>
+
+
                                     <AutocompleteHint
                                         options={coins}
                                         label="Cryptos"
                                         id="1"
+                                        onChange={handleSelectedValueChange}
                                     />
                                     {console.log(coins)}
                                 </div>
@@ -308,6 +359,7 @@ export default function BuyCrypto() {
                                         options={devises}
                                         label="Devises"
                                         id="2"
+                                        onChange={handleSelectedValueChange}
                                     />
                                 </div>
                             </div>
@@ -325,9 +377,20 @@ export default function BuyCrypto() {
                                 min={0}
                                 max={100}
                             />
-                            <Typography>
+                            <Typography margin='auto' fontWeight={600}>
                                 Montant sélectionné: {amount}
                             </Typography>
+                            <div style={{ display: 'flex', flexDirection: 'row', margin: 'auto', gap: '20px' }}>
+                                <p style={{ fontWeight: 600, fontFamily: 'Poppins', justifyContent: 'space-around' }}>
+                                    {thisWallet ? 'Portefeuille : ' + thisWallet.name : ''}
+
+                                </p>
+                                <p>|</p>
+                                <p style={{ fontWeight: 600, fontFamily: 'Poppins', margin: 'auto' }}>
+                                    {thisWallet ? 'Solde : ' + thisWallet.solde + ' €' : ''}
+
+                                </p>
+                            </div>
                             <button
                                 className={classes.button}
                                 type="sumbit">Recevoir</button>

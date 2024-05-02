@@ -22,6 +22,7 @@ class WalletController extends AbstractController
 
 
     #[Route('/api/walletupdate/{walletName}', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function updateWallet(
         string $walletName,
         Request $request,
