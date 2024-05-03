@@ -225,13 +225,13 @@ export default function BuyCrypto() {
         const inputValue = e.target.value;
         if (inputValue === '') {
             setError(false);
-            setAmount(inputValue) // Réinitialise l'erreur si l'utilisateur efface le contenu
+            setAmount(inputValue);
         } else if (parseFloat(inputValue) <= solde) {
             setAmount(inputValue);
-            setError(false); // Réinitialise l'erreur si la valeur saisie est valide
+            setError(false);
         } else {
-            setAmount(solde.toString()); // Remplace la valeur saisie par le solde
-            setError(true); // Définit l'erreur sur true si la valeur saisie dépasse le solde
+            setAmount(solde.toString());
+            setError(true);
         }
     };
 
