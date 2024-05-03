@@ -30,11 +30,11 @@ class WalletService
         return $wallet;
     }
 
-    public function updateWalletSolde(User $user, string $walletName, float $newSolde): void
+    public function updateWalletSolde(User $user, int $walletId, float $newSolde): void
     {
         $wallet = null;
         foreach ($user->getWallets() as $userWallet) {
-            if ($userWallet->getName() === $walletName) {
+            if ($userWallet->getId() === $walletId) {
                 $wallet = $userWallet;
                 break;
             }

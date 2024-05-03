@@ -26,12 +26,15 @@ class Order
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Wallet $wallet = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Crypto $crypto = null;
+
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    private ?Devise $devise = null;
 
 
     public function getId(): ?int
@@ -95,6 +98,18 @@ class Order
     public function setCrypto(?Crypto $crypto): static
     {
         $this->crypto = $crypto;
+
+        return $this;
+    }
+
+    public function getDevise(): ?Devise
+    {
+        return $this->devise;
+    }
+
+    public function setDevise(?Devise $devise): static
+    {
+        $this->devise = $devise;
 
         return $this;
     }

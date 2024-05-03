@@ -45,7 +45,7 @@ class UserController extends AbstractController
         $hashedPassword = $hasheur->hashPassword($user, $user->getPassword());
         $user->setPassword($hashedPassword);
 
-        $wallet = $this->walletService->createWallet($user);
+        $this->walletService->createWallet($user);
 
 
         $em->persist($user);

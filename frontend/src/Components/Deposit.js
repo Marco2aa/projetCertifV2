@@ -4,6 +4,8 @@ import AutocompleteHint from './Autocomplete';
 import { Button, InputAdornment, TextField } from '@mui/material';
 import SelectWallet from './SelectWallet';
 import axios from 'axios'
+import { useNavigate } from 'react-router';
+import { loadStripe } from '@stripe/stripe-js';
 
 const Deposit = () => {
 
@@ -12,6 +14,9 @@ const Deposit = () => {
     const [montant, setMontant] = useState(0)
     const [wallet, setWallet] = useState([])
     const [selectedWallet, setSelectedWallet] = useState('')
+    const [sessionId, setSessionId] = useState('')
+
+    const navigate = useNavigate()
 
     const token = localStorage.getItem('token')
 
@@ -20,8 +25,12 @@ const Deposit = () => {
             const montantEuros = montant / selectedValue.valeur
             console.log(montantEuros)
             try {
-                const response = await axios.post(`https://localhost:8000/api/walletupdate/${thisWallet}`, {
-                    solde: montantEuros
+                const response = await axios.post(`https://localhost:8000/api/walletupdate/${(thisWallet)}`, {
+                    solde: montantEuros,
+                    type: 'depot',
+                    quantity: montant,
+                    deviseId: parseInt(selectedValue.id)
+
                 }, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -29,6 +38,37 @@ const Deposit = () => {
                     }
                 });
                 console.log(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.log('No value selected');
+        }
+    };
+
+    const handleEuroDeposit = async () => {
+        const stripe = await loadStripe('pk_test_51PCKdwJY5Z1qjO57ILNP2mLo6qGyF2GMm3BbEBuVM52DoLWJoejzCYYRpsccpzWnZlaCRskr5fsozXHCD9lp9thC00eZzvDhcw')
+        if (selectedValue && thisWallet) {
+            const montantEuros = montant / selectedValue.valeur;
+            try {
+                const response = await axios.post(
+                    `https://localhost:8000/api/create-checkout-session`,
+                    {
+                        montantEuros: montantEuros.toFixed(2),
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            Accept: 'application/json',
+                        },
+                    }
+                );
+                console.log(response.data);
+                setSessionId(response.data.sessionId)
+                stripe.redirectToCheckout({
+                    sessionId: response.data.sessionId
+                })
+                // await handleDeposit(thisWallet.id)
             } catch (error) {
                 console.error(error);
             }
@@ -131,7 +171,7 @@ const Deposit = () => {
                         fontSize: "1.2em",
                         fontWeight: "500",
                         width: "100%"
-                    }} onClick={() => handleDeposit(thisWallet.name)} >Déposer</button>
+                    }} onClick={() => handleEuroDeposit()} >Déposer</button>
                 </div>
             </div>
         </div>

@@ -81,6 +81,8 @@ export default function BuyCrypto() {
     };
 
 
+
+
     const handlePercentageChange = (event, newValue) => {
         setSelectedPercentage(newValue);
         const newAmount = calculateAmount(newValue);
