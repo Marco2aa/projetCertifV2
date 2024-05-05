@@ -7,6 +7,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router';
 import { loadStripe } from '@stripe/stripe-js';
 
+
 const Deposit = () => {
 
     const { currency, devises } = CryptoState()
@@ -15,46 +16,35 @@ const Deposit = () => {
     const [wallet, setWallet] = useState([])
     const [selectedWallet, setSelectedWallet] = useState('')
     const [sessionId, setSessionId] = useState('')
+    const [username, setUsername] = useState(null)
 
     const navigate = useNavigate()
 
     const token = localStorage.getItem('token')
 
-    const handleDeposit = async (thisWallet) => {
-        if (selectedValue) {
-            const montantEuros = montant / selectedValue.valeur
-            console.log(montantEuros)
-            try {
-                const response = await axios.post(`https://localhost:8000/api/walletupdate/${(thisWallet)}`, {
-                    solde: montantEuros,
-                    type: 'depot',
-                    quantity: montant,
-                    deviseId: parseInt(selectedValue.id)
-
-                }, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        Accept: 'application/json',
-                    }
-                });
-                console.log(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        } else {
-            console.log('No value selected');
-        }
-    };
 
     const handleEuroDeposit = async () => {
         const stripe = await loadStripe('pk_test_51PCKdwJY5Z1qjO57ILNP2mLo6qGyF2GMm3BbEBuVM52DoLWJoejzCYYRpsccpzWnZlaCRskr5fsozXHCD9lp9thC00eZzvDhcw')
         if (selectedValue && thisWallet) {
+            const token = localStorage.getItem('token');
+
+
             const montantEuros = montant / selectedValue.valeur;
             try {
+
+                const decodedToken = decodeJWT(token);
+                const username = decodedToken.username;
+                console.log(decodedToken)
+                console.log(username)
+                setUsername(username);
+
                 const response = await axios.post(
                     `https://localhost:8000/api/create-checkout-session`,
                     {
                         montantEuros: montantEuros.toFixed(2),
+                        deviseId: parseInt(selectedValue.id),
+                        email: username,
+                        walletId: parseInt(thisWallet.id)
                     },
                     {
                         headers: {
@@ -68,12 +58,24 @@ const Deposit = () => {
                 stripe.redirectToCheckout({
                     sessionId: response.data.sessionId
                 })
-                // await handleDeposit(thisWallet.id)
             } catch (error) {
                 console.error(error);
             }
         } else {
             console.log('No value selected');
+        }
+    };
+
+    const decodeJWT = (token) => {
+        try {
+            const payload = token.split('.')[1];
+            const decodedPayload = atob(payload);
+            const parsedPayload = JSON.parse(decodedPayload);
+            console.log(parsedPayload)
+            return parsedPayload;
+        } catch (error) {
+            console.error('Error decoding JWT:', error);
+            return null;
         }
     };
 

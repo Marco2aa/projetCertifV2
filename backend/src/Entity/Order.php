@@ -36,6 +36,11 @@ class Order
     #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?Devise $devise = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Stripe $stripe = null;
+
+
+
 
     public function getId(): ?int
     {
@@ -110,6 +115,18 @@ class Order
     public function setDevise(?Devise $devise): static
     {
         $this->devise = $devise;
+
+        return $this;
+    }
+
+    public function getStripe(): ?Stripe
+    {
+        return $this->stripe;
+    }
+
+    public function setStripe(?Stripe $stripe): static
+    {
+        $this->stripe = $stripe;
 
         return $this;
     }

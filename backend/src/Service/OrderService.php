@@ -25,7 +25,7 @@ class OrderService
         $this->deviseRepository = $deviseRepository;
     }
 
-    public function createDepositOrder(string $type, float $quantity, \DateTimeImmutable $createdAt, $walletId, $deviseId = null)
+    public function createDepositOrder(string $type, float $quantity, \DateTimeImmutable $createdAt, $walletId, $deviseId = null, $stripe = null)
     {
 
         $wallet = $this->walletRepository->find($walletId);
@@ -42,6 +42,7 @@ class OrderService
         $order->setCreatedAt($createdAt);
         $order->setWallet($wallet);
         $order->setDevise($devise);
+        $order->setStripe($stripe);
 
 
 
