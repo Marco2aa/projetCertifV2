@@ -7,7 +7,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { Autocomplete, Slider, TextField } from '@mui/material';
+import { Autocomplete, InputAdornment, Slider, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import AutocompleteHint from './Autocomplete';
 import axios from 'axios';
@@ -17,6 +17,7 @@ import SelectWallet from './SelectWallet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './RegisterForm/RegisterForm.css'
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { loadStripe } from '@stripe/stripe-js';
 
 
 function TabPanel(props) {
@@ -63,9 +64,9 @@ export default function BuyCrypto() {
     const [page, setPage] = useState(1);
     const [pageTitle, setPageTitle] = useState('Achetez des Cryptos .');
     const [selectedPercentage, setSelectedPercentage] = useState(0);
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState('');
     const [amountToSpend, setAmountToSpend] = useState(0);
-    const [amountToReceive, setAmountToReceive] = useState(0);
+    const [amountToReceive, setAmountToReceive] = useState(null);
     const [solde, setSolde] = useState(0)
     const [selectedValue, setSelectedValue] = useState(null);
     const [wallet, setWallet] = useState([])
@@ -78,9 +79,66 @@ export default function BuyCrypto() {
     console.log(thisWallet);
 
 
+    const handleEuroDeposit = async () => {
+        const stripe = await loadStripe('pk_test_51PCKdwJY5Z1qjO57ILNP2mLo6qGyF2GMm3BbEBuVM52DoLWJoejzCYYRpsccpzWnZlaCRskr5fsozXHCD9lp9thC00eZzvDhcw')
+        if (selectedValue && thisWallet) {
+            const token = localStorage.getItem('token');
+
+
+            // const montantEuros = montant / selectedValue.valeur;
+            try {
+
+                const decodedToken = decodeJWT(token);
+                const username = decodedToken.username;
+                console.log(decodedToken)
+                console.log(username)
+                // setUsername(username);
+
+                const response = await axios.post(
+                    `https://localhost:8000/api/create-checkout-session`,
+                    {
+                        // montantEuros: montantEuros.toFixed(2),
+                        // deviseId: parseInt(selectedValue.id),
+                        // email: username,
+                        // walletId: parseInt(thisWallet.id)
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            Accept: 'application/json',
+                        },
+                    }
+                );
+                console.log(response.data);
+                // setSessionId(response.data.sessionId)
+                // stripe.redirectToCheckout({
+                //     sessionId: response.data.sessionId
+                // })
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.log('No value selected');
+        }
+    };
+
+    const decodeJWT = (token) => {
+        try {
+            const payload = token.split('.')[1];
+            const decodedPayload = atob(payload);
+            const parsedPayload = JSON.parse(decodedPayload);
+            console.log(parsedPayload)
+            return parsedPayload;
+        } catch (error) {
+            console.error('Error decoding JWT:', error);
+            return null;
+        }
+    };
+
+
     const calculateAmount = (percentage) => {
-        const walletBalance = solde;
-        const calculatedAmount = (percentage / 100) * walletBalance;
+        const walletBalance = thisWallet.solde;
+        const calculatedAmount = (percentage / 100) * walletBalance * deviseSelected.valeur;
         return calculatedAmount.toFixed(2);
     };
 
@@ -94,7 +152,7 @@ export default function BuyCrypto() {
     }, [cryptoSelected, deviseSelected, amount]);
 
     const calculateAmountToReceive = (amountToSpend, cryptoSelected, deviseSelected) => {
-        const sum = amountToSpend * deviseSelected.valeur / cryptoSelected.current_price
+        const sum = amountToSpend / deviseSelected.valeur / cryptoSelected.current_price
         return sum
 
     };
@@ -161,7 +219,7 @@ export default function BuyCrypto() {
                 }
             })
             console.log(response.data)
-            setSolde(response.data[0].solde)
+
             setWallet(response.data)
         } catch (error) {
             console.error('erreur lors de la recuperation du portefeuille :', error)
@@ -251,11 +309,11 @@ export default function BuyCrypto() {
         if (inputValue === '') {
             setError(false);
             setAmount(inputValue);
-        } else if (parseFloat(inputValue) <= solde) {
+        } else if (parseFloat(inputValue) <= thisWallet.solde) {
             setAmount(inputValue);
             setError(false);
         } else {
-            setAmount(solde.toString());
+            setAmount(thisWallet.solde.toString());
             setError(true);
         }
     };
@@ -271,9 +329,6 @@ export default function BuyCrypto() {
         }}>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '60px' }}>
                 <Typography fontWeight={700} variant="h2">{pageTitle}</Typography>
-                <Typography>Pris en charge :
-
-                </Typography>
                 <div className={classes.fivecryptos}>
                     <p style={{ marginLeft: '15px', fontWeight: 500 }}>Cryptos populaires</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -343,16 +398,25 @@ export default function BuyCrypto() {
                             <div className={classes.div}>
                                 <div className={classes.fields}>
                                     <div style={{ width: '100%' }}>
-
                                         <TextField
-                                            fullWidth
+                                            id="outlined-number"
                                             color='warning'
-                                            label="Depenser"
-                                            placeholder={`0.00 - ${solde.toFixed(2)}`}
+                                            fullWidth
+                                            label="Dépenser"
                                             type="text"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            placeholder={deviseSelected && thisWallet
+                                                ? `0.00 - ${(thisWallet.solde * deviseSelected.valeur).toFixed(2)}`
+                                                : ''}
                                             value={amount}
                                             onChange={handleAmountChange}
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start">{deviseSelected ? deviseSelected.name : ''}</InputAdornment>,
+                                            }}
                                         />
+                                        {console.log(thisWallet)}
                                         {error && (
                                             <p id="pwdnote" className={error ? "instructions" : "offscreen"}>
                                                 <FontAwesomeIcon icon={faInfoCircle} />
@@ -379,6 +443,12 @@ export default function BuyCrypto() {
                                         placeholder='0.00'
                                         type="text"
                                         value={amountToReceive}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">{cryptoSelected ? cryptoSelected.symbol : ''}</InputAdornment>,
+                                        }}
 
                                     />
                                     <AutocompleteHint
@@ -389,23 +459,32 @@ export default function BuyCrypto() {
                                     />
                                 </div>
                             </div>
-                            <Slider
-                                value={selectedPercentage}
-                                onChange={handlePercentageChange}
-                                aria-label="Temperature"
-                                defaultValue={30}
-                                color='warning'
-                                // getAriaValueText={valuetext}
-                                valueLabelDisplay="auto"
-                                shiftStep={30}
-                                step={10}
-                                marks
-                                min={0}
-                                max={100}
-                            />
-                            <Typography margin='auto' fontWeight={600}>
-                                Montant sélectionné: {amount}
-                            </Typography>
+                            {thisWallet && deviseSelected && cryptoSelected &&
+                                < Slider
+                                    value={selectedPercentage}
+                                    onChange={handlePercentageChange}
+                                    aria-label="Temperature"
+                                    defaultValue={30}
+                                    color='warning'
+                                    valueLabelDisplay="auto"
+                                    shiftStep={30}
+                                    step={10}
+                                    marks
+                                    min={0}
+                                    max={100}
+                                />
+                            }
+                            {deviseSelected && cryptoSelected &&
+                                <>
+                                    <Typography margin='auto' fontWeight={600}>
+                                        Montant : {amount + deviseSelected.name}
+                                    </Typography>
+                                    <Typography margin='auto' fontWeight={600}>
+                                        Montant en Euros: {(amount / deviseSelected.valeur).toFixed(2)} €
+                                    </Typography>
+                                </>
+                            }
+
                             <div style={{ display: 'flex', flexDirection: 'row', margin: 'auto', gap: '20px' }}>
                                 <p style={{ fontWeight: 600, fontFamily: 'Poppins', justifyContent: 'space-around' }}>
                                     {thisWallet ? 'Portefeuille : ' + thisWallet.name : ''}
