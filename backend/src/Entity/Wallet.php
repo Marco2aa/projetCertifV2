@@ -7,6 +7,7 @@ use App\Repository\WalletRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: WalletRepository::class)]
 #[ApiResource]
@@ -28,6 +29,7 @@ class Wallet
      * @var Collection<int, Order>
      */
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'wallet')]
+    #[Groups(['wallet.show'])]
     private Collection $orders;
 
     #[ORM\Column(length: 255)]

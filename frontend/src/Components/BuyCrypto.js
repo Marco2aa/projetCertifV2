@@ -64,11 +64,15 @@ export default function BuyCrypto() {
     const [pageTitle, setPageTitle] = useState('Achetez des Cryptos .');
     const [selectedPercentage, setSelectedPercentage] = useState(0);
     const [amount, setAmount] = useState(0);
+    const [amountToSpend, setAmountToSpend] = useState(0);
+    const [amountToReceive, setAmountToReceive] = useState(0);
     const [solde, setSolde] = useState(0)
     const [selectedValue, setSelectedValue] = useState(null);
     const [wallet, setWallet] = useState([])
     const [selectedWallet, setSelectedWallet] = useState('')
     const [error, setError] = useState(false)
+    const [cryptoSelected, setCryptoSelected] = useState(null);
+    const [deviseSelected, setDeviseSelected] = useState(null);
 
     const thisWallet = wallet.find(item => item.name === selectedWallet)
     console.log(thisWallet);
@@ -78,6 +82,21 @@ export default function BuyCrypto() {
         const walletBalance = solde;
         const calculatedAmount = (percentage / 100) * walletBalance;
         return calculatedAmount.toFixed(2);
+    };
+
+    useEffect(() => {
+        if (cryptoSelected && deviseSelected) {
+            const calculatedAmountToReceive = calculateAmountToReceive(amount, cryptoSelected, deviseSelected);
+            console.log(amount, cryptoSelected.current_price, deviseSelected.valeur, calculatedAmountToReceive)
+            setAmountToReceive(calculatedAmountToReceive)
+
+        }
+    }, [cryptoSelected, deviseSelected, amount]);
+
+    const calculateAmountToReceive = (amountToSpend, cryptoSelected, deviseSelected) => {
+        const sum = amountToSpend * deviseSelected.valeur / cryptoSelected.current_price
+        return sum
+
     };
 
 
@@ -214,8 +233,12 @@ export default function BuyCrypto() {
 
     const classes = useStyles()
 
-    const handleSelectedValueChange = (newValue) => {
-        setSelectedValue(newValue);
+    const handleCryptoSelectedChange = (newValue) => {
+        setCryptoSelected(newValue);
+    }
+
+    const handleDeviseSelectedChange = (newValue) => {
+        setDeviseSelected(newValue);
     }
 
     const handleSelectWallet = (selectedValue) => {
@@ -341,10 +364,10 @@ export default function BuyCrypto() {
 
 
                                     <AutocompleteHint
-                                        options={coins}
-                                        label="Cryptos"
-                                        id="1"
-                                        onChange={handleSelectedValueChange}
+                                        options={devises}
+                                        label="Devises"
+                                        id="2"
+                                        onChange={handleDeviseSelectedChange}
                                     />
                                     {console.log(coins)}
                                 </div>
@@ -355,13 +378,14 @@ export default function BuyCrypto() {
                                         label="Recevoir"
                                         placeholder='0.00'
                                         type="text"
+                                        value={amountToReceive}
 
                                     />
                                     <AutocompleteHint
-                                        options={devises}
-                                        label="Devises"
-                                        id="2"
-                                        onChange={handleSelectedValueChange}
+                                        options={coins}
+                                        label="Cryptos"
+                                        id="1"
+                                        onChange={handleCryptoSelectedChange}
                                     />
                                 </div>
                             </div>
