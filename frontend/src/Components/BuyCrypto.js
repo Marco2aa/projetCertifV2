@@ -7,7 +7,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { Autocomplete, InputAdornment, Slider, TextField } from '@mui/material';
+import { Autocomplete, Button, InputAdornment, Slider, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import AutocompleteHint from './Autocomplete';
 import axios from 'axios';
@@ -74,52 +74,55 @@ export default function BuyCrypto() {
     const [error, setError] = useState(false)
     const [cryptoSelected, setCryptoSelected] = useState(null);
     const [deviseSelected, setDeviseSelected] = useState(null);
+    const [sessionId, setSessionId] = useState(null)
+    const [username, setUsername] = useState(null)
 
     const thisWallet = wallet.find(item => item.name === selectedWallet)
     console.log(thisWallet);
 
 
-    const handleEuroDeposit = async () => {
+    const handleBuyDeposit = async () => {
         const stripe = await loadStripe('pk_test_51PCKdwJY5Z1qjO57ILNP2mLo6qGyF2GMm3BbEBuVM52DoLWJoejzCYYRpsccpzWnZlaCRskr5fsozXHCD9lp9thC00eZzvDhcw')
-        if (selectedValue && thisWallet) {
-            const token = localStorage.getItem('token');
+
+        const token = localStorage.getItem('token');
 
 
-            // const montantEuros = montant / selectedValue.valeur;
-            try {
 
-                const decodedToken = decodeJWT(token);
-                const username = decodedToken.username;
-                console.log(decodedToken)
-                console.log(username)
-                // setUsername(username);
+        try {
 
-                const response = await axios.post(
-                    `https://localhost:8000/api/create-checkout-session`,
-                    {
-                        // montantEuros: montantEuros.toFixed(2),
-                        // deviseId: parseInt(selectedValue.id),
-                        // email: username,
-                        // walletId: parseInt(thisWallet.id)
+            const decodedToken = decodeJWT(token);
+            const username = decodedToken.username;
+            console.log(decodedToken)
+            console.log(username)
+            setUsername(username);
+
+            const response = await axios.post(
+                `https://localhost:8000/api/create-checkout-session/buy-and-sell`,
+                {
+                    cryptoId: parseInt(cryptoSelected.id),
+                    email: username,
+                    walletId: parseInt(thisWallet.id),
+                    quantity: parseInt(amountToReceive.toFixed(2)),
+                    amount: amount,
+                    deviseId: parseInt(deviseSelected.id)
+
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
                     },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            Accept: 'application/json',
-                        },
-                    }
-                );
-                console.log(response.data);
-                // setSessionId(response.data.sessionId)
-                // stripe.redirectToCheckout({
-                //     sessionId: response.data.sessionId
-                // })
-            } catch (error) {
-                console.error(error);
-            }
-        } else {
-            console.log('No value selected');
+                }
+            );
+            console.log(response.data);
+            setSessionId(response.data.sessionId)
+            stripe.redirectToCheckout({
+                sessionId: response.data.sessionId
+            })
+        } catch (error) {
+            console.error(error);
         }
+
     };
 
     const decodeJWT = (token) => {
@@ -391,7 +394,7 @@ export default function BuyCrypto() {
                             backgroundColor: 'transparent'
                         }
                     }} value={value} index={0} dir={theme.direction}>
-                        <form
+                        <div
                             className={classes.form}>
                             <SelectWallet wallets={wallet} onSelect={handleSelectWallet} />
 
@@ -497,9 +500,10 @@ export default function BuyCrypto() {
                                 </p>
                             </div>
                             <button
+                                onClick={() => handleBuyDeposit()}
                                 className={classes.button}
-                                type="sumbit">Recevoir</button>
-                        </form>
+                            >Recevoir</button>
+                        </div>
                     </TabPanel>
                     <TabPanel value={value} index={1} dir={theme.direction}>
                         <form
@@ -523,8 +527,10 @@ export default function BuyCrypto() {
                                 />
                             </div>
                             <button
+
                                 className={classes.button}
-                                type="sumbit">Recevoir</button>
+                            >Recevoir
+                            </button>
                         </form>
                     </TabPanel>
                 </SwipeableViews>

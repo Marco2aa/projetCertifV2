@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Stripe;
+use App\Repository\CryptoRepository;
+use App\Repository\ProduitStripeRepository;
 use App\Repository\StripeRepository;
 use App\Repository\UserRepository;
 use App\Service\OrderService;
@@ -110,5 +112,69 @@ class PaymentController extends AbstractController
         }
 
         return  new JsonResponse(['message' => 'ok']);
+    }
+
+    #[Route('/api/create-checkout-session/buy-and-sell', name: 'create_checkout_session_buy_and_sell', methods: ['POST'])]
+    public function createBuyCheckoutSession(Request $request, ProduitStripeRepository $productRepository, CryptoRepository $cryptoRepo): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+
+
+
+
+
+        \Stripe\Stripe::setApiKey('sk_test_51PCKdwJY5Z1qjO57uVjIzHduLdHEMHSg6M6juDc7aDBoOypPJAmnfkWzjmmtwa9JNN94LPVACDwX8yzD90hcJZe700jZYfc6qu');
+
+        try {
+
+
+            $cryptoId = $data['cryptoId'];
+            // Trouver l'entité Crypto correspondante
+            $crypto = $cryptoRepo->find($cryptoId);
+
+            // Vérifier si la Crypto existe
+            if (!$crypto) {
+                throw new \Exception('Crypto not found');
+            }
+
+            // Accéder à la relation ProduitStripe depuis l'entité Crypto
+            $produitStripe = $crypto->getProduitStripe();
+
+            // Extraire l'identifiant du produit
+            $productId = $produitStripe->getProduitId();
+
+
+
+
+            $session = Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'unit_amount' => $data['amount'] * 100,
+                        'product' => $productId,
+                        'quantity' => $data['quantity'],
+                    ],
+                ]],
+                'metadata' => [
+                    'deviseId' => $data['deviseId'],
+                    'userName' => $data['email'],
+                    'walletId' => $data['walletId'],
+                    'quantity' => $data['quantity']
+
+                ],
+                'mode' => 'payment',
+                'success_url' => 'https://example.com/success',
+                'cancel_url' => 'https://example.com/cancel',
+            ]);
+
+
+
+
+            return $this->json(['sessionId' => $session->id]);
+        } catch (ApiErrorException $e) {
+            return new JsonResponse(['error' => 'Error creating checkout session: ' . $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

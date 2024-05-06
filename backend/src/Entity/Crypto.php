@@ -96,6 +96,11 @@ class Crypto
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'crypto')]
     private Collection $orders;
 
+    #[ORM\OneToOne(mappedBy: 'crypto', cascade: ['persist', 'remove'])]
+    private ?ProduitStripe $produitStripe = null;
+
+
+
 
 
     public function __construct()
@@ -412,6 +417,28 @@ class Crypto
                 $order->setCrypto(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProduitStripe(): ?ProduitStripe
+    {
+        return $this->produitStripe;
+    }
+
+    public function setProduitStripe(?ProduitStripe $produitStripe): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($produitStripe === null && $this->produitStripe !== null) {
+            $this->produitStripe->setCrypto(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($produitStripe !== null && $produitStripe->getCrypto() !== $this) {
+            $produitStripe->setCrypto($this);
+        }
+
+        $this->produitStripe = $produitStripe;
 
         return $this;
     }
