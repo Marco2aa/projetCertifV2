@@ -62,7 +62,7 @@ export default function BuyCrypto() {
     const [loading, setLoading] = useState(false);
     const [coins, setCoins] = useState([]);
     const [page, setPage] = useState(1);
-    const [pageTitle, setPageTitle] = useState('Achetez des Cryptos .');
+    const [pageTitle, setPageTitle] = useState('Achetez des Cryptos.');
     const [selectedPercentage, setSelectedPercentage] = useState(0);
     const [amount, setAmount] = useState('');
     const [amountToSpend, setAmountToSpend] = useState(0);

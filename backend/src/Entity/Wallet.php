@@ -21,7 +21,7 @@ class Wallet
     #[ORM\Column]
     private ?float $solde = null;
 
-    #[ORM\ManyToOne(inversedBy: 'wallets')]
+    #[ORM\ManyToOne(inversedBy: 'wallets', cascade: ["persist"])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
