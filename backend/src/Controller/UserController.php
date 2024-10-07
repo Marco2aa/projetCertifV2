@@ -10,6 +10,9 @@ use App\Entity\User;
 use App\Entity\Wallet;
 use App\Service\WalletService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -45,6 +48,7 @@ class UserController extends AbstractController
         $hashedPassword = $hasheur->hashPassword($user, $user->getPassword());
         $user->setPassword($hashedPassword);
 
+
         $this->walletService->createWallet($user);
 
 
@@ -55,5 +59,40 @@ class UserController extends AbstractController
         return $this->json($user, 201, [], [
             'groups' => ['user.show']
         ]);
+    }
+
+
+    #[Route(path: '/api/user/upload-image', name: 'user_upload_image', methods: ['POST'])]
+    public function uploadImage(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        // Récupérer l'utilisateur connecté
+        /** @var User $user */
+        $user = $this->getUser();
+
+        // Récupérer l'image uploadée
+        $file = $request->files->get('image');
+
+        if ($file) {
+            $uploadsDirectory = $this->getParameter('uploads_directory');
+            $filename = md5(uniqid()) . '.' . $file->guessExtension();
+
+            try {
+                // Déplacer l'image téléchargée dans le répertoire défini
+                $file->move($uploadsDirectory, $filename);
+
+                // Définir le nom de l'image dans l'entité User
+                $user->setImage($filename);
+
+                // Enregistrer l'utilisateur
+                $em->persist($user);
+                $em->flush();
+
+                return new JsonResponse(['image' => $filename], Response::HTTP_OK);
+            } catch (FileException $e) {
+                return new JsonResponse(['error' => 'File upload failed.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return new JsonResponse(['error' => 'No file uploaded.'], Response::HTTP_BAD_REQUEST);
     }
 }

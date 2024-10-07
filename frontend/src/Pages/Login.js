@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import LoginForm from '../Components/LoginForm';
 import FormLayout from '../Components/FormLayout';
 import RegisterForm from '../Components/RegisterForm/RegisterForm';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
+import { AuthContext } from '../Context/AuthContext';
 
 const Login = () => {
-  const [register, setRegister] = useState(false);
+  const { isAuthenticated, register, toggleRegister } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const handleClick = () => {
-    setRegister(!register)
-  }
-
-
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+      console.log(isAuthenticated)
+    }
+  }, [isAuthenticated, navigate])
 
   return (
     <div>
@@ -21,12 +24,12 @@ const Login = () => {
         {register ? (
           <>
             <RegisterForm />
-            <Link onClick={handleClick}>Déjà un compte ? Connectez vous maintenant</Link>
+            <Link onClick={toggleRegister}>Déjà un compte ? Connectez-vous maintenant</Link>
           </>
         ) : (
           <>
             <LoginForm />
-            <Link onClick={handleClick}>Créez un compte Afllo'Crypto</Link>
+            <Link onClick={toggleRegister}>Créez un compte Afllo'Crypto</Link>
           </>
         )}
       </FormLayout>

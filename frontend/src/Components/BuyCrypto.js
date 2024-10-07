@@ -12,7 +12,7 @@ import { makeStyles } from '@mui/styles';
 import AutocompleteHint from './Autocomplete';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
-import { CryptoState } from '../CryptoContext';
+import { CryptoState } from '../Context/CryptoContext';
 import SelectWallet from './SelectWallet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './RegisterForm/RegisterForm.css'
@@ -359,7 +359,8 @@ export default function BuyCrypto() {
                 height: '100%',
                 borderRadius: 5,
                 // overflow: "hidden",
-                border: '1px solid grey'
+                border: '1px solid grey',
+                marginTop: "20px"
             }} >
                 <AppBar color='transparent' position="static"
 

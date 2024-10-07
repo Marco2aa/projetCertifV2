@@ -226,4 +226,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    #[ORM\Column(type: 'string', length: 64, nullable: true)]
+    private ?string $passwordResetToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $passwordResetTokenExpiresAt = null;
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $token): self
+    {
+        $this->passwordResetToken = $token;
+
+        return $this;
+    }
+
+    public function getPasswordResetTokenExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->passwordResetTokenExpiresAt;
+    }
+
+    public function setPasswordResetTokenExpiresAt(?\DateTimeInterface $expiration): self
+    {
+        $this->passwordResetTokenExpiresAt = $expiration;
+
+        return $this;
+    }
+
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $image;
+
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
 }

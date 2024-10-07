@@ -23,6 +23,8 @@ security:
             stateless: true
             json_login:
                 check_path: /api/login
+                username_path: email     # Ici on précise que l'email est l'identifiant
+                password_path: password  # Ici on précise que le mot de passe est sous la clé "password"
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 

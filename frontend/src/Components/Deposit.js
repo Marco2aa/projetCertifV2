@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CryptoState } from '../CryptoContext'
+import { CryptoState } from '../Context/CryptoContext'
 import AutocompleteHint from './Autocomplete';
 import { Button, InputAdornment, TextField } from '@mui/material';
 import SelectWallet from './SelectWallet';

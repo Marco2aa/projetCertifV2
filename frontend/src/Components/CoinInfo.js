@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CryptoState } from '../CryptoContext.js';
+import { CryptoState } from '../Context/CryptoContext.js';
 import { HistoricalChart } from '../config/api.js';
 import axios from 'axios';
 import { useTheme } from '@material-ui/core';
@@ -33,14 +33,7 @@ const CoinInfo = ({ coin }) => {
     fetchHistoricData(coin.id, days, currency);
   }, [currency, days]);
 
-  // const darkTheme = createTheme({
-  //   palette: {
-  //     primary: {
-  //       main: "#fff",
-  //     },
-  //     type: "dark",
-  //   }
-  // });
+
 
   const useStyles = makeStyles(() => ({
     container: {

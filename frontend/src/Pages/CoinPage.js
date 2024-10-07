@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router';
-import { CryptoState } from '../CryptoContext.js';
+import CryptoState from "../Context/CryptoContext.js"
+
 import { ThemeProvider, makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import axios from "axios";

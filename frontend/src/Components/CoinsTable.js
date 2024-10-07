@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from "axios";
 import { numberWithCommas } from './Banner/Carousel.js';
-import { CryptoState } from '../CryptoContext.js';
+import { CryptoState } from '../Context/CryptoContext.js';
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from '@mui/styles';
 import { Container, ThemeProvider, Typography, createTheme } from '@material-ui/core';

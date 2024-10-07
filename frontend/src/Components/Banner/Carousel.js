@@ -1,29 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@mui/styles'
 import { GetDataBaseCoins, TrendingCoins } from '../../config/api.js';
-import { CryptoState } from '../../CryptoContext.js';
+import { CryptoState } from '../../Context/CryptoContext.js';
 import axios from 'axios';
 import AliceCarousel from 'react-alice-carousel'
 import { Link } from 'react-router-dom';
 
-const useStyles = makeStyles((theme)=> ({
-    carousel :{
+const useStyles = makeStyles((theme) => ({
+    carousel: {
         height: "100%",
-        display:"flex",
-        alignItems:"center"
+        display: "flex",
+        alignItems: "center"
     },
     carouselItem: {
         display: "flex",
         flexDirection: "column",
-        alignItems:"center",
-        cursor:"pointer",
-        textTransform:"uppercase",
-        color:"white",
+        alignItems: "center",
+        cursor: "pointer",
+        textTransform: "uppercase",
+        color: "white",
     },
 
 }))
 
-export function numberWithCommas(x){
+export function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -33,9 +33,9 @@ const Carousel = () => {
     const [trending, setTrending] = useState([])
     const [value, setValue] = useState(1)
     const classes = useStyles();
-    const{ currency, symbol, devises } = CryptoState()
-    const fetchTrendingCoins = async() => {
-        const {data} = await axios.get(GetDataBaseCoins(1));
+    const { currency, symbol, devises } = CryptoState()
+    const fetchTrendingCoins = async () => {
+        const { data } = await axios.get(GetDataBaseCoins(1));
         console.log(data);
         setTrending(data['hydra:member']);
     };
@@ -58,36 +58,36 @@ const Carousel = () => {
 
     const responsive = {
         0: {
-            items:2,
+            items: 2,
         },
-        512:{
-            items:5,
+        512: {
+            items: 5,
         }
     }
 
     const items = trending.map((coin) => {
-        let profit = coin.price_change_percentage_24h>=0
+        let profit = coin.price_change_percentage_24h >= 0
 
-        return(
+        return (
             <Link
-            className={classes.carouselItem}
-            to={`/coins/${coin.id}`}>
+                className={classes.carouselItem}
+                to={`/coins/${coin.id}`}>
                 <img
-                src={coin?.image}
-                alt = {coin.name}
-                height = "80"
-                style={{marginBottom:10}} />
-            
+                    src={coin?.image}
+                    alt={coin.name}
+                    height="80"
+                    style={{ marginBottom: 10 }} />
+
                 <span>{coin?.symbol}
                     &nbsp;
                     <span
-                    style={{
-                        color: profit > 0 ? "rgb(14,203,129)" : "red",
-                        fontWeight:500,
-                    }}
-                    
+                        style={{
+                            color: profit > 0 ? "rgb(14,203,129)" : "red",
+                            fontWeight: 500,
+                        }}
+
                     >
-                    {profit && '+'} {coin?.price_change_percentage_24h?.toFixed(2)}%
+                        {profit && '+'} {coin?.price_change_percentage_24h?.toFixed(2)}%
                     </span>
                 </span>
 
@@ -102,21 +102,21 @@ const Carousel = () => {
         )
     })
 
-  return (
-    <div className={classes.carousel}>
-      <AliceCarousel
-      mouseTracking
-      infinite
-      autoPlayInterval={1000}
-      animationDuration={1500}
-      disableDotsControls
-      responsive = {responsive}
-      autoPlay
-      items = {items}>
+    return (
+        <div className={classes.carousel}>
+            <AliceCarousel
+                mouseTracking
+                infinite
+                autoPlayInterval={1000}
+                animationDuration={1500}
+                disableDotsControls
+                responsive={responsive}
+                autoPlay
+                items={items}>
 
-      </AliceCarousel>
-    </div>
-  )
+            </AliceCarousel>
+        </div>
+    )
 }
 
 export default Carousel
