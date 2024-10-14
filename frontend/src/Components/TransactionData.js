@@ -104,7 +104,7 @@ export default function TransactionData() {
     const fetchOrders = async () => {
         setLoading(true)
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('jwtToken')
             const response = await axios.get(`https://localhost:8000/api/getorders`,
                 {
                     headers: {

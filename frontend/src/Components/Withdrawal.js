@@ -16,11 +16,11 @@ const Withdrawal = () => {
 
     const navigate = useNavigate();
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('jwtToken');
 
     const handleEuroWithdrawal = async () => {
         if (selectedValue && thisWallet) {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('jwtToken');
 
             const montantEuros = montant / selectedValue.valeur;
             try {

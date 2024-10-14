@@ -213,7 +213,7 @@ export default function BuyCrypto() {
 
     const fetchWallet = async () => {
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('jwtToken')
             console.log(token)
             const response = await axios.get('https://localhost:8000/api/walletuser', {
                 headers: {

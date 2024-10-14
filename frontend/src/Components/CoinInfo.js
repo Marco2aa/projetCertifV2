@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { CryptoState } from '../Context/CryptoContext.js';
 import { HistoricalChart } from '../config/api.js';
 import axios from 'axios';
 import { useTheme } from '@material-ui/core';
@@ -10,6 +9,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import SelectButton from './SelectButton.js';
 import { chartDays } from '../config/data.js';
+import { CryptoState } from '../Context/CryptoContext.js';
 
 ChartJS.register(...registerables);
 

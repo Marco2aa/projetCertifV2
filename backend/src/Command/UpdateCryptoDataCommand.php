@@ -33,8 +33,7 @@ class UpdateCryptoDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->entityManager->createQuery('DELETE FROM App\Entity\Crypto')->execute();
-        
+        // Récupérer la liste des cryptos depuis l'API
         $response = $this->httpClient->request(
             'GET',
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=EUR&order=market_cap_desc&per_page=100&page=1&sparkline=false'
@@ -42,9 +41,15 @@ class UpdateCryptoDataCommand extends Command
         $cryptos = $response->toArray();
 
         foreach ($cryptos as $cryptoData) {
-            
-            $crypto = new Crypto();
-            $crypto->setIdenitifiant($cryptoData['id']);
+            $existingCrypto = $this->entityManager->getRepository(Crypto::class)->findOneBy(['idenitifiant' => $cryptoData['id']]);
+
+            if ($existingCrypto) {
+                $crypto = $existingCrypto;
+            } else {
+                $crypto = new Crypto();
+                $crypto->setIdenitifiant($cryptoData['id']);
+            }
+
             $crypto->setSymbol($cryptoData['symbol']);
             $crypto->setName($cryptoData['name']);
             $crypto->setImage($cryptoData['image']);
@@ -69,7 +74,6 @@ class UpdateCryptoDataCommand extends Command
             $crypto->setAtlDate(new \DateTime($cryptoData['atl_date']));
 
             $this->entityManager->persist($crypto);
-            
         }
 
         $this->entityManager->flush();

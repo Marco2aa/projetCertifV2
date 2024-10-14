@@ -1,41 +1,46 @@
 import React from 'react';
-import ReactDOM from 'react-dom'; // Import ReactDOM
 import ReactApexChart from 'react-apexcharts'; // Import ReactApexChart
+import axios from 'axios'; // Import Axios
 
 export default class ApexChart extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            series: [
-                {
-                    data: [
-                        { x: 'INTC', y: 1.2 },
-                        { x: 'GS', y: 0.4 },
-                        { x: 'CVX', y: -1.4 },
-                        { x: 'GE', y: 2.7 },
-                        { x: 'CAT', y: -0.3 },
-                        { x: 'RTX', y: 5.1 },
-                        { x: 'CSCO', y: -2.3 },
-                        { x: 'JNJ', y: 2.1 },
-                        { x: 'PG', y: 0.3 },
-                        { x: 'TRV', y: 0.12 },
-                        { x: 'MMM', y: -2.31 },
-                        { x: 'NKE', y: 3.98 },
-                        { x: 'IYT', y: 1.67 }
-                    ]
-                }
-            ],
+            series: [], // Initialiser la série de données vide
             options: {
                 legend: {
-                    show: false
+                    show: true,
+                    labels: {
+                        colors: '#000', // Couleur noire pour la légende
+                    },
                 },
                 chart: {
                     height: 350,
-                    type: 'treemap'
+                    type: 'treemap',
+                    // Ajout des marges de 10% à gauche et à droite
+                    margin: {
+                        left: '10%',
+                        right: '10%'
+                    }
+                },
+                theme: {
+                    palette: 'palette1', // Palette de couleurs pour rendre le texte visible
                 },
                 title: {
-                    text: 'Treemap with Color scale'
+                    text: 'Treemap with Color scale',
+                    align: 'center', // Centrer le titre
+                    style: {
+                        color: "orange",
+                        fontSize: "20px"
+                    }
+                },
+                tooltip: {
+                    theme: 'dark', // Changer le thème du tooltip pour éviter le blanc sur blanc
+                    style: {
+                        fontSize: '16px',
+                        color: '#000' // Couleur du texte du tooltip en noir
+                    }
                 },
                 dataLabels: {
                     enabled: true,
@@ -55,13 +60,13 @@ export default class ApexChart extends React.Component {
                         colorScale: {
                             ranges: [
                                 {
-                                    from: -6,
+                                    from: -100,
                                     to: 0,
                                     color: '#CD363A'
                                 },
                                 {
                                     from: 0.001,
-                                    to: 6,
+                                    to: 100,
                                     color: '#52B12C'
                                 }
                             ]
@@ -72,15 +77,42 @@ export default class ApexChart extends React.Component {
         };
     }
 
+    componentDidMount() {
+        this.fetchCryptoData();
+    }
+
+    fetchCryptoData = async () => {
+        try {
+            const response = await axios.get('https://localhost:8000/api/cryptos'); // Remplacer l'URL par votre endpoint
+            const data = response.data['hydra:member'];
+
+            // Transformer les données pour le treemap
+            const transformedData = data.map((crypto) => ({
+                x: crypto.name,
+                y: crypto.market_cap_change_percentage_24h, // Utiliser la variation du market cap sur 24h comme valeur
+            }));
+
+            this.setState({
+                series: [
+                    {
+                        data: transformedData
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données :', error);
+        }
+    };
+
     render() {
         return (
-            <div>
+            <div style={{ margin: '0 5%' }}>
                 <div id="chart">
                     <ReactApexChart
                         options={this.state.options}
                         series={this.state.series}
                         type="treemap"
-                        height={750}
+                        height={950}
                     />
                 </div>
                 <div id="html-dist"></div>
@@ -88,4 +120,3 @@ export default class ApexChart extends React.Component {
         );
     }
 }
-

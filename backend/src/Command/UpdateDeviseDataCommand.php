@@ -47,7 +47,7 @@ class UpdateDeviseDataCommand extends Command
             $existingDevise = $this->entityManager->getRepository(Devise::class)->findOneBy(['nom' => $currency]);
             if (!$existingDevise) {
                 $devise = new Devise();
-                $devise->setNom($currency);
+                $devise->setName($currency);
                 $devise->setValeur($value);
                 $this->entityManager->persist($devise);
             } else {

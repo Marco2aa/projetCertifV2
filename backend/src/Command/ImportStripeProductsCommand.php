@@ -58,12 +58,11 @@ class ImportStripeProductsCommand extends Command
                 // Associate the Product with the Crypto
 
 
-                // Persist the Product entity
                 $this->entityManager->persist($product);
             }
         }
 
-        // Flush changes to the database
+
         $this->entityManager->flush();
 
         $output->writeln('Stripe products imported successfully.');

@@ -103,7 +103,8 @@ class PaymentController extends AbstractController
                     new \DateTimeImmutable(),
                     $walletId,
                     $deviseId,
-                    $stripe
+                    $stripe,
+                    $user
                 );
             }
             return new JsonResponse(['message' => 'ok']);
@@ -119,16 +120,9 @@ class PaymentController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-
-
-
-
-
-        \Stripe\Stripe::setApiKey('sk_test_51PCKdwJY5Z1qjO57uVjIzHduLdHEMHSg6M6juDc7aDBoOypPJAmnfkWzjmmtwa9JNN94LPVACDwX8yzD90hcJZe700jZYfc6qu');
+        \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
         try {
-
-
             $cryptoId = $data['cryptoId'];
             // Trouver l'entité Crypto correspondante
             $crypto = $cryptoRepo->find($cryptoId);
@@ -137,16 +131,11 @@ class PaymentController extends AbstractController
             if (!$crypto) {
                 throw new \Exception('Crypto not found');
             }
-
             // Accéder à la relation ProduitStripe depuis l'entité Crypto
             $produitStripe = $crypto->getProduitStripe();
 
             // Extraire l'identifiant du produit
             $productId = $produitStripe->getProduitId();
-
-
-
-
             $session = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
@@ -168,9 +157,6 @@ class PaymentController extends AbstractController
                 'success_url' => 'https://example.com/success',
                 'cancel_url' => 'https://example.com/cancel',
             ]);
-
-
-
 
             return $this->json(['sessionId' => $session->id]);
         } catch (ApiErrorException $e) {

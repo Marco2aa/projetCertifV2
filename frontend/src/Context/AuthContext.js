@@ -8,6 +8,7 @@ const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
+    const [register, setRegister] = useState(false);
 
 
     const decodeJWT = (token) => {
@@ -22,25 +23,55 @@ const AuthProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
+    const isTokenExpired = (decodedToken) => {
+        if (!decodedToken || !decodedToken.exp) {
+            return true;
+        }
+        const currentTime = Date.now() / 1000;
+        return decodedToken.exp < currentTime;
+    };
+
+    const loadToken = () => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
             const decodedToken = decodeJWT(token);
-            setAuthToken(token);
-            setIsAuthenticated(true);
-            setUser(decodedToken);
+            if (isTokenExpired(decodedToken)) {
+                logout();
+            } else {
+                setAuthToken(token);
+                setIsAuthenticated(true);
+                setUser(decodedToken);
+            }
         }
+    };
+
+    useEffect(() => {
+        loadToken();
+
+        const intervalId = setInterval(() => {
+            const token = localStorage.getItem('jwtToken');
+            if (token) {
+                const decodedToken = decodeJWT(token);
+                if (isTokenExpired(decodedToken)) {
+                    logout();
+                }
+            }
+        }, 3000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     const login = async (email, password, notifysuccess, notifyfailure, navigate) => {
         try {
             const response = await axios.post('https://localhost:8000/api/login', {
-                username: email,
+                email: email,
                 password: password,
             });
-            localStorage.setItem('jwtToken', response.data.token);
-            const decodedToken = decodeJWT(response.data.token);
-            setAuthToken(response.data.token);
+            const token = response.data.token;
+            localStorage.setItem('jwtToken', token);
+
+            const decodedToken = decodeJWT(token);
+            setAuthToken(token);
             setIsAuthenticated(true);
             setUser(decodedToken);
             notifysuccess();
@@ -54,6 +85,12 @@ const AuthProvider = ({ children }) => {
         }
     };
 
+    const toggleRegister = () => {
+        console.log('Toggle register clicked');
+        setRegister((prevState) => !prevState);
+    };
+
+    // Fonction pour déconnecter l'utilisateur
     const logout = () => {
         localStorage.removeItem('jwtToken');
         setAuthToken(null);
@@ -62,7 +99,7 @@ const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ authToken, isAuthenticated, user, error, login, logout }}>
+        <AuthContext.Provider value={{ authToken, isAuthenticated, user, error, register, toggleRegister, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

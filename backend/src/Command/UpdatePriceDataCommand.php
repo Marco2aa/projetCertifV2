@@ -68,10 +68,7 @@ class UpdatePriceDataCommand extends Command
                     $output->writeln('price added' . $count1);
                     $this->entityManager->flush();
                 }
-                usleep(20000000); //Permet de contourner ma limite de 30 appels/minutes.
-
-
-
+                usleep(20000000);
             }
         }
 

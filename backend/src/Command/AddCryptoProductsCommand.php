@@ -36,7 +36,6 @@ class AddCryptoProductsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Configure Stripe with your secret key
         \Stripe\Stripe::setApiKey('sk_test_51PCKdwJY5Z1qjO57uVjIzHduLdHEMHSg6M6juDc7aDBoOypPJAmnfkWzjmmtwa9JNN94LPVACDwX8yzD90hcJZe700jZYfc6qu');
 
         $cryptos = $this->cryptoRepo->findAll();

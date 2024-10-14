@@ -39,6 +39,9 @@ class Order
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Stripe $stripe = null;
 
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    private ?User $user = null;
+
 
 
 
@@ -127,6 +130,18 @@ class Order
     public function setStripe(?Stripe $stripe): static
     {
         $this->stripe = $stripe;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

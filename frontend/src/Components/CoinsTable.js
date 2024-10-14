@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { numberWithCommas } from './Banner/Carousel.js';
 import { CryptoState } from '../Context/CryptoContext.js';
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from '@mui/styles';
-import { Container, ThemeProvider, Typography, createTheme } from '@material-ui/core';
-import { LinearProgress, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { FormControl, Select, MenuItem, LinearProgress, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Container } from '@mui/material';
+import { Box, Typography } from '@material-ui/core';
+
 
 const CoinsTable = () => {
     const [coins, setCoins] = useState([]);
@@ -15,20 +16,17 @@ const CoinsTable = () => {
     const navigate = useNavigate();
     const [value, setValue] = useState(1)
 
-    const { currency, devises } = CryptoState();
+    const { currency, devises, setCurrency } = CryptoState();
     console.log(devises);
     console.log(currency)
 
-    const fetchCoins = useCallback(async () => {
+    const fetchCoins = async () => {
         setLoading(true);
         let allCoins = [];
         try {
-            for (let page = 1; page <= 4; page++) {
-                const response = await axios.get(`https://127.0.0.1:8000/api/cryptos?page=${page}`);
-                const data = response.data;
-                allCoins = [...allCoins, ...data['hydra:member']];
-            }
-
+            const response = await axios.get(`https://127.0.0.1:8000/api/cryptos`);
+            const data = response.data;
+            allCoins = data['hydra:member'];
             setCoins(allCoins);
             setLoading(false);
             console.log(allCoins);
@@ -36,11 +34,11 @@ const CoinsTable = () => {
             console.error("Error fetching coins:", error);
             setLoading(false);
         }
-    }, [currency, page]);
+    };
 
     useEffect(() => {
         fetchCoins();
-    }, [fetchCoins]);
+    }, []);
 
     useEffect(() => {
         if (devises && devises.length > 0) {
@@ -92,17 +90,37 @@ const CoinsTable = () => {
     return (
         // <ThemeProvider theme={darktheme}>
         <Container style={{ textAlign: "center" }}>
+
             <Typography variant='h4' style={{ margin: 18, fontFamily: 'Montserrat' }}>
                 CryptoMonnaies par part de marché
             </Typography>
-            <TextField
-                label="Recherchez une Crypto Monnaie"
-                variant="outlined"
-                style={{ marginBottom: 20, width: "100%", borderColor: "white" }}
-                InputLabelProps={{ style: { color: "white" } }}
-                inputProps={{ style: { borderColor: "white", color: "white" } }}
-                onChange={(e) => setSearch(e.target.value)}
-            />
+            <Box
+                sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "flex-start", gap: 2 }}
+            >
+                <FormControl sx={{ minWidth: 120, mt: 0 }}> {/* Supprimer la marge */}
+                    <Select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        label="Devise"
+                        autoWidth
+                    >
+                        {devises.map((devise) => (
+                            <MenuItem key={devise.id} value={devise.name}>{devise.name}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <TextField
+                    label="Recherchez une Crypto Monnaie"
+                    variant="outlined"
+                    sx={{ mb: 2, width: "100%" }} // Utilisation de `sx` pour plus de flexibilité
+                    InputLabelProps={{ style: { color: "white" } }}
+                    inputProps={{ style: { borderColor: "white", color: "white" } }}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </Box>
+
+
             <TableContainer>
                 {loading ? (
                     <LinearProgress style={{ backgroundColor: "orange" }} />

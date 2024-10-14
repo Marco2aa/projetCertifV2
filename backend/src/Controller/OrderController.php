@@ -24,8 +24,9 @@ class OrderController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function getAllOrders(): JsonResponse
     {
+        $user = $this->getUser();
 
-        $orders = $this->orderService->getOrderDetails();
+        $orders = $this->orderService->getOrderDetails($user);
 
         return new JsonResponse($orders);
     }

@@ -20,13 +20,13 @@ const Deposit = () => {
 
     const navigate = useNavigate()
 
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('jwtToken')
 
 
     const handleEuroDeposit = async () => {
         const stripe = await loadStripe('pk_test_51PCKdwJY5Z1qjO57ILNP2mLo6qGyF2GMm3BbEBuVM52DoLWJoejzCYYRpsccpzWnZlaCRskr5fsozXHCD9lp9thC00eZzvDhcw')
         if (selectedValue && thisWallet) {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('jwtToken');
 
 
             const montantEuros = montant / selectedValue.valeur;
