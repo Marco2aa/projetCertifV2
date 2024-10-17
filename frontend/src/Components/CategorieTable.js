@@ -25,6 +25,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { useCallback } from 'react';
 import { useState } from 'react';
+import { BASE_URL } from "../config/api"
 
 // function createData(id, name, calories, fat, carbs, protein) {
 //   return {
@@ -61,8 +62,7 @@ function descendingComparator(a, b, orderBy) {
   }
 }
 
-// Modifier la fonction getComparator pour traiter les nombres et les chaînes de caractères
-// Modifier la fonction getComparator pour traiter les nombres et les chaînes de caractères
+
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => {
@@ -98,10 +98,7 @@ function getComparator(order, orderBy) {
 
 
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
+
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -210,61 +207,6 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-// function EnhancedTableToolbar(props) {
-//   const { numSelected } = props;
-
-//   return (
-//     <Toolbar
-//       sx={{
-//         pl: { sm: 2 },
-//         pr: { xs: 1, sm: 1 },
-//         ...(numSelected > 0 && {
-//           bgcolor: (theme) =>
-//             alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-//         }),
-//       }}
-//     >
-//       {numSelected > 0 ? (
-//         <Typography
-//           sx={{ flex: '1 1 100%' }}
-//           color="inherit"
-//           variant="subtitle1"
-//           component="div"
-//         >
-//           {numSelected} selected
-//         </Typography>
-//       ) : (
-//         <Typography
-//           sx={{ flex: '1 1 100%' }}
-//           variant="h6"
-//           id="tableTitle"
-//           component="div"
-//         >
-//           Nutrition
-//         </Typography>
-//       )}
-
-//       {numSelected > 0 ? (
-//         <Tooltip title="Delete">
-//           <IconButton>
-//             <DeleteIcon />
-//           </IconButton>
-//         </Tooltip>
-//       ) : (
-//         <Tooltip title="Filter list">
-//           <IconButton>
-//             <FilterListIcon />
-//           </IconButton>
-//         </Tooltip>
-//       )}
-//     </Toolbar>
-//   );
-// }
-
-// EnhancedTableToolbar.propTypes = {
-//   numSelected: PropTypes.number.isRequired,
-// };
-
 export default function CategorieTable() {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('market_cap');
@@ -276,29 +218,13 @@ export default function CategorieTable() {
   const [visibleRows, setVisibleRows] = React.useState([]);
 
 
-  // const rows = [
-
-  //   createData(2, 'Donut', 452, 25.0, 51, 4.9),
-  //   createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-  //   createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-  //   createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-  //   createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-  //   createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-  //   createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-  //   createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-  //   createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-  //   createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-  //   createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-  //   createData(13, 'Oreo', 437, 18.0, 63, 4.0),
-  // ];
-
 
 
   const fetchCategorie = useCallback(async () => {
     try {
       let allCategories = [];
       for (let page = 1; page <= 8; page++) {
-        const response = await axios.get(`https://localhost:8000/api/categories?page=${page}`);
+        const response = await axios.get(`${BASE_URL}/api/categories?page=${page}`);
         const data = response.data;
         allCategories = [...allCategories, ...data['hydra:member']];
       }

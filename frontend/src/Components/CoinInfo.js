@@ -20,32 +20,32 @@ const CoinInfo = ({ coin }) => {
   const { currency } = CryptoState();
 
   const theme = useTheme();
-
   const matchesMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const fetchHistoricData = async (id, days, currency) => {
-    const { data } = await axios.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=${days}&x_cg_demo_api_key=CG-gDHAm9CSTV5ATdZaHa7Xx7JS`)
+    const { data } = await axios.get(
+      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=${days}&x_cg_demo_api_key=CG-gDHAm9CSTV5ATdZaHa7Xx7JS`
+    );
     setHistoricalData(data.prices);
-    console.log(data.prices)
+    console.log(data.prices);
   };
 
   useEffect(() => {
     fetchHistoricData(coin.id, days, currency);
   }, [currency, days]);
 
-
-
   const useStyles = makeStyles(() => ({
     container: {
-      width: "75%",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginTop: 25,
       padding: 40,
+      overflow: 'hidden', // Added to prevent overflow
       ...(matchesMD && {
-        width: "100%",
+        width: '100%',
         marginTop: 0,
         padding: 20,
         paddingTop: 0,
@@ -56,19 +56,14 @@ const CoinInfo = ({ coin }) => {
   const classes = useStyles();
 
   return (
-    // <ThemeProvider theme={darkTheme}>
     <div className={classes.container}>
       {!historicalData ? (
-        <CircularProgress
-          style={{ color: "orange" }}
-          size={250}
-          thickness={1}
-        />
+        <CircularProgress style={{ color: 'orange' }} size={250} thickness={1} />
       ) : (
         <>
           <Line
             data={{
-              labels: historicalData.map(coin => {
+              labels: historicalData.map((coin) => {
                 let date = new Date(coin[0]);
                 let time =
                   date.getHours() > 12
@@ -79,34 +74,42 @@ const CoinInfo = ({ coin }) => {
               }),
               datasets: [
                 {
-                  data: historicalData.map(coin => coin[1]),
+                  data: historicalData.map((coin) => coin[1]),
                   label: `Price (Past ${days} Days) in ${currency}`,
-                  borderColor: "#EEBC1D"
-                }
-              ]
+                  borderColor: '#EEBC1D',
+                  fill: false,
+                },
+              ],
             }}
             options={{
               elements: {
                 point: {
-                  radius: 1
-                }
-              }
+                  radius: 1,
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10,
+                  },
+                },
+              },
+            }}
+            style={{
+              maxWidth: '100%',
             }}
           />
           <div
             style={{
-              display: "flex",
+              display: 'flex',
               marginTop: 20,
-              justifyContent: "space-around",
-              width: "100%"
+              justifyContent: 'space-around',
+              width: '100%',
             }}
           >
-            {chartDays.map(day => (
-              <SelectButton
-                key={day.value}
-                onClick={() => setDays(day.value)}
-                selected={day.value === days}
-              >
+            {chartDays.map((day) => (
+              <SelectButton key={day.value} onClick={() => setDays(day.value)} selected={day.value === days}>
                 {day.label}
               </SelectButton>
             ))}
@@ -114,7 +117,6 @@ const CoinInfo = ({ coin }) => {
         </>
       )}
     </div>
-
   );
 };
 

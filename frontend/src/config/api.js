@@ -11,8 +11,8 @@ export const TrendingCoins = (currency) =>
   `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=gecko_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h`;
 
 export const GetDataBaseCoins = (nbPage) =>
-   `https://127.0.0.1:8000/api/cryptos?page=${nbPage}`
+  `https://127.0.0.1:8000/api/cryptos?page=${nbPage}`
 
-
+export const BASE_URL = "https://127.0.0.1:8000"
 
 

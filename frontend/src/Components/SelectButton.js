@@ -21,6 +21,7 @@ const SelectButton = ({ children, selected, onClick }) => {
             },
             width: "22%",
             // margin:5,
+            overflow: "hidden"
         }
     });
 

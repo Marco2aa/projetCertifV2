@@ -36,6 +36,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user.show'])]
     private array $roles = [];
 
+    #[ORM\Column(length: 3)]
+    #[Assert\NotBlank(message: 'Le code pays ne doit pas être vide.')]
+    #[Assert\Length(
+        max: 3,
+        maxMessage: 'Le code pays ne peut pas dépasser {{ limit }} caractères.'
+    )]
+    private ?string $countryCode = null;
+
+    #[ORM\Column(length: 15)]
+    #[Assert\NotBlank(message: 'Le numéro de téléphone ne doit pas être vide.')]
+    #[Assert\Regex(
+        pattern: '/^\d+$/',
+        message: 'Le numéro de téléphone doit contenir uniquement des chiffres.'
+    )]
+    #[Groups(['user.show'])]
+    private ?string $phoneNumber = null;
+
+    // Getters et setters pour countryCode et phoneNumber
+
     /**
      * @var string The hashed password
      */
@@ -259,6 +278,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user.show'])]
     private $image;
 
     /**
@@ -306,6 +326,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $order->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+
+
+    public function getCountryCode(): ?string
+    {
+        return $this->countryCode;
+    }
+
+    public function setCountryCode(?string $countryCode): self
+    {
+        $this->countryCode = $countryCode;
+
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\Length(
+        max: 500,
+        maxMessage: 'La bio ne peut pas dépasser {{ limit }} caractères.'
+    )]
+    #[Groups(['user.show'])]
+    private ?string $bio = null;
+
+    // Getter et setter pour bio
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): self
+    {
+        $this->bio = $bio;
 
         return $this;
     }

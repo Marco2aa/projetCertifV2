@@ -40,20 +40,20 @@ function LoginForm() {
     }
   }));
 
-  const notifysucces = () => toast('🦄 Wow so easy!');
-  const notifyfailure = () => toast('🦄 Wow not so easy!');
+  // Modification des notifications de succès et d'échec
+  const notifysuccess = (message) => toast.success(message);
+  const notifyfailure = (message) => toast.error(message);
 
   const classes = useStyles();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      await login(email, password, notifysucces, notifyfailure, navigate);
+      await login(email, password, notifysuccess, notifyfailure, navigate);
     } else {
-      notifyfailure();
+      notifyfailure('Vous êtes déjà connecté.');
     }
   };
-
 
   if (showForgotPassword) {
     return <PasswordResetRequestForm />;
@@ -100,7 +100,6 @@ function LoginForm() {
         <span style={{ cursor: 'pointer', color: 'orange', textDecoration: 'underline' }} onClick={() => setShowForgotPassword(true)}>
           Mot de passe oublié ?
         </span>
-
       </Box>
 
       <ToastContainer

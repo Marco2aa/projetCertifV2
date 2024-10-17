@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Stripe;
 use App\Repository\CryptoRepository;
+use App\Repository\DeviseRepository;
 use App\Repository\ProduitStripeRepository;
 use App\Repository\StripeRepository;
 use App\Repository\UserRepository;
@@ -31,7 +32,7 @@ class PaymentController extends AbstractController
 
 
 
-        \Stripe\Stripe::setApiKey('sk_test_51PCKdwJY5Z1qjO57uVjIzHduLdHEMHSg6M6juDc7aDBoOypPJAmnfkWzjmmtwa9JNN94LPVACDwX8yzD90hcJZe700jZYfc6qu');
+        \Stripe\Stripe::setApiKey('sk_test_51Ovg9SK0rs45oKLry2Bm17nxBsh886BTtFXwPXjU91aiuuFs6M8osIjFEq5E4oCNdV42hZuufGzWsdsNfLdr0rL300eHmQCd2D');
 
         try {
 
@@ -102,9 +103,9 @@ class PaymentController extends AbstractController
                     $amount,
                     new \DateTimeImmutable(),
                     $walletId,
+                    $user->getId(),
                     $deviseId,
-                    $stripe,
-                    $user
+                    $stripe
                 );
             }
             return new JsonResponse(['message' => 'ok']);
@@ -116,16 +117,17 @@ class PaymentController extends AbstractController
     }
 
     #[Route('/api/create-checkout-session/buy-and-sell', name: 'create_checkout_session_buy_and_sell', methods: ['POST'])]
-    public function createBuyCheckoutSession(Request $request, ProduitStripeRepository $productRepository, CryptoRepository $cryptoRepo): JsonResponse
+    public function createBuyCheckoutSession(Request $request, ProduitStripeRepository $productRepository, CryptoRepository $cryptoRepo, DeviseRepository $deviseRepo): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+        \Stripe\Stripe::setApiKey('sk_test_51Ovg9SK0rs45oKLry2Bm17nxBsh886BTtFXwPXjU91aiuuFs6M8osIjFEq5E4oCNdV42hZuufGzWsdsNfLdr0rL300eHmQCd2D');
 
         try {
             $cryptoId = $data['cryptoId'];
             // Trouver l'entité Crypto correspondante
             $crypto = $cryptoRepo->find($cryptoId);
+            $devise = $deviseRepo->find($data['deviseId']);
 
             // Vérifier si la Crypto existe
             if (!$crypto) {
@@ -141,16 +143,19 @@ class PaymentController extends AbstractController
                 'line_items' => [[
                     'price_data' => [
                         'currency' => 'eur',
-                        'unit_amount' => $data['amount'] * 100,
+                        'unit_amount' => round(($data['amount'] / $devise->getValeur()) * 100),
                         'product' => $productId,
-                        'quantity' => $data['quantity'],
+
                     ],
+                    'quantity' => 1,
                 ]],
                 'metadata' => [
                     'deviseId' => $data['deviseId'],
                     'userName' => $data['email'],
                     'walletId' => $data['walletId'],
-                    'quantity' => $data['quantity']
+                    'quantity' => $data['quantity'],
+                    'eur_price' => ($data['amount'] / $devise->getValeur()) * 100,
+                    'this_price' => $crypto->getCurrentPrice(),
 
                 ],
                 'mode' => 'payment',

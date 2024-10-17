@@ -67,6 +67,7 @@ const AuthProvider = ({ children }) => {
                 email: email,
                 password: password,
             });
+
             const token = response.data.token;
             localStorage.setItem('jwtToken', token);
 
@@ -74,16 +75,24 @@ const AuthProvider = ({ children }) => {
             setAuthToken(token);
             setIsAuthenticated(true);
             setUser(decodedToken);
-            notifysuccess();
+
+            // Notification de succès
+            notifysuccess('Connexion réussie !');
 
             setTimeout(() => {
                 navigate('/');
             }, 3000);
         } catch (error) {
-            setError('Invalid credentials. Please try again.');
-            notifyfailure();
+            if (error.response && error.response.status === 401 && error.response.data.message === 'Invalid credentials.') {
+                // Notification d'échec personnalisée pour les identifiants invalides
+                notifyfailure('Mot de passe incorrect ou email incorrect.');
+            } else {
+                // Notification générique pour toute autre erreur
+                notifyfailure('Échec de la connexion, veuillez réessayer.');
+            }
         }
     };
+
 
     const toggleRegister = () => {
         console.log('Toggle register clicked');

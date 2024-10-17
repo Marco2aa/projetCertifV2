@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { makeStyles } from '@mui/styles';
 import { FormControl, Select, MenuItem, LinearProgress, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Container } from '@mui/material';
 import { Box, Typography } from '@material-ui/core';
+import { BASE_URL } from "../config/api.js"
 
 
 const CoinsTable = () => {
@@ -18,13 +19,13 @@ const CoinsTable = () => {
 
     const { currency, devises, setCurrency } = CryptoState();
     console.log(devises);
-    console.log(currency)
+    console.log("devise", currency)
 
     const fetchCoins = async () => {
         setLoading(true);
         let allCoins = [];
         try {
-            const response = await axios.get(`https://127.0.0.1:8000/api/cryptos`);
+            const response = await axios.get(`${BASE_URL}/api/cryptos`);
             const data = response.data;
             allCoins = data['hydra:member'];
             setCoins(allCoins);
@@ -113,7 +114,7 @@ const CoinsTable = () => {
                 <TextField
                     label="Recherchez une Crypto Monnaie"
                     variant="outlined"
-                    sx={{ mb: 2, width: "100%" }} // Utilisation de `sx` pour plus de flexibilité
+                    sx={{ mb: 2, width: "100%" }}
                     InputLabelProps={{ style: { color: "white" } }}
                     inputProps={{ style: { borderColor: "white", color: "white" } }}
                     onChange={(e) => setSearch(e.target.value)}
@@ -195,7 +196,7 @@ const CoinsTable = () => {
                                         <TableCell align="right">
                                             <span style={{ color: "white" }}>
 
-                                                {numberWithCommas((row.current_price * value).toFixed(2))}
+                                                {numberWithCommas((row.current_price * value).toFixed(2))}{currency}
                                             </span>
                                         </TableCell>
                                         <TableCell

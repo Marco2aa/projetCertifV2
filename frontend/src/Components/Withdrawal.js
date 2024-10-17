@@ -95,7 +95,7 @@ const Withdrawal = () => {
 
     return (
         <div style={{ width: '100%' }}>
-            <div style={{ width: '50%', margin: 'auto', marginTop: '100px', border: 'solid 1px grey', borderRadius: '8px' }}>
+            <div style={{ width: '50%', margin: 'auto', marginTop: 40, border: 'solid 1px grey', borderRadius: '8px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', padding: '20px' }}>
                     <SelectWallet wallets={wallet} onSelect={handleSelectWallet} />
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '35px', fontFamily: 'Poppins' }}>

@@ -82,9 +82,9 @@ export default function BuyCrypto() {
 
 
     const handleBuyDeposit = async () => {
-        const stripe = await loadStripe('pk_test_51PCKdwJY5Z1qjO57ILNP2mLo6qGyF2GMm3BbEBuVM52DoLWJoejzCYYRpsccpzWnZlaCRskr5fsozXHCD9lp9thC00eZzvDhcw')
+        const stripe = await loadStripe('pk_test_51Ovg9SK0rs45oKLrHtLQYiAIGDvnTmnLNl0PhVWSq7fUI5q9i4nrpGInw3rSf02dT9iSpZXOQzmUOTytWIBD2Kom00bcCSMTyd')
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('jwtToken');
 
 
 
@@ -102,7 +102,7 @@ export default function BuyCrypto() {
                     cryptoId: parseInt(cryptoSelected.id),
                     email: username,
                     walletId: parseInt(thisWallet.id),
-                    quantity: parseInt(amountToReceive.toFixed(2)),
+                    quantity: (amountToReceive.toFixed(5)),
                     amount: amount,
                     deviseId: parseInt(deviseSelected.id)
 
@@ -328,7 +328,7 @@ export default function BuyCrypto() {
             gap: '250px',
             justifyContent: 'space-evenly',
             width: '100%',
-            marginTop: 5,
+            marginTop: 3,
         }}>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '60px' }}>
                 <Typography fontWeight={700} variant="h2">{pageTitle}</Typography>

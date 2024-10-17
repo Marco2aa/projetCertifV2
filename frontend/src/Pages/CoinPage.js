@@ -1,66 +1,54 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { CryptoState } from '../Context/CryptoContext.js';
-import { ThemeProvider, makeStyles } from '@mui/styles';
-import { useState } from 'react';
-import axios from "axios";
-import { SingleCoin } from '../config/api.js';
-import CoinInfo from '../Components/CoinInfo.js';
+import { makeStyles } from '@mui/styles';
 import { LinearProgress, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import axios from 'axios';
+import CoinInfo from '../Components/CoinInfo.js';
 import { numberWithCommas } from '../Components/Banner/Carousel.js';
+import { SingleCoin } from '../config/api.js';
 
 const CoinPage = () => {
   const { id } = useParams();
   const [coin, setCoin] = useState();
-  const { currency, symbol } = CryptoState();
-  const theme = useTheme();
 
-  const matchesMD = useMediaQuery(theme.breakpoints.down('md'));
-  const matchesSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const matchesXS = useMediaQuery(theme.breakpoints.down('xs'));
+  const { currency, symbol } = CryptoState();
 
   const fetchCoin = async () => {
     const { data } = await axios.get(SingleCoin(id));
+    console.log(data)
     setCoin(data);
   };
 
-  console.log(coin);
-  console.log(currency, coin)
-
   useEffect(() => {
     fetchCoin();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const useStyles = makeStyles(() => ({
-    wrapper: {
-
-    },
+  const useStyles = makeStyles((theme) => ({
     container: {
       display: "flex",
-      ...(matchesMD && {
+      [theme.breakpoints.down("md")]: {
         flexDirection: "column",
         alignItems: "center",
-      }),
-      // height:"100vh",
-      flexGrow: 1,
+      },
     },
     sidebar: {
-      width: matchesSM ? "100%" : "30%",
+      width: "30%",
+      [theme.breakpoints.down("md")]: {
+        width: "100%",
+      },
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       marginTop: 25,
-      borderRight: matchesMD ? "none" : "2px solid grey",
-      height: "100vh",
-      flexShrink: 0,
-      gap: 50
-
+      borderRight: "2px solid grey",
     },
     heading: {
-      fontWeight: "bolder",
-      marginBottom: "40px",
+      fontWeight: "bold",
+      marginBottom: 20,
       fontFamily: "Montserrat",
     },
     description: {
@@ -68,42 +56,33 @@ const CoinPage = () => {
       fontFamily: "Montserrat",
       padding: 25,
       paddingBottom: 15,
-      paddingTop: 40,
+      paddingTop: 0,
       textAlign: "justify",
     },
     marketData: {
       alignSelf: "start",
       padding: 25,
       paddingTop: 10,
-      display: "flex",
-      flexDirection: "column",
-
-      gap: 40,
       width: "100%",
-      ...(matchesMD && {
+      [theme.breakpoints.down("md")]: {
         display: "flex",
         justifyContent: "space-around",
-        flexDirection: "row",
-
-      }),
-      ...(matchesSM && {
+      },
+      [theme.breakpoints.down("sm")]: {
         flexDirection: "column",
         alignItems: "center",
-      }),
-      ...(matchesXS && {
+      },
+      [theme.breakpoints.down("xs")]: {
         alignItems: "start",
-      }),
+      },
     },
   }));
 
   const classes = useStyles();
 
-  if (!coin) return <LinearProgress style={{
-    backgroundColor: "gold",
-  }} />
+  if (!coin) return <LinearProgress style={{ backgroundColor: "gold" }} />;
 
   return (
-
     <div className={classes.container}>
       <div className={classes.sidebar}>
         <img
@@ -116,34 +95,52 @@ const CoinPage = () => {
           {coin?.name}
         </Typography>
         <Typography variant="subtitle1" className={classes.description}>
-          {coin?.description?.en?.split(". ")[0]}.
+          {coin?.description.en.split(". ")[0]}.
         </Typography>
-
         <div className={classes.marketData}>
           <span style={{ display: "flex" }}>
             <Typography variant="h5" className={classes.heading}>
               Rank:
             </Typography>
-            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
-              {coin?.market_cap_rank}
+            &nbsp; &nbsp;
+            <Typography
+              variant="h5"
+              style={{
+                fontFamily: "Montserrat",
+              }}
+            >
+              {numberWithCommas(coin?.market_cap_rank)}
             </Typography>
           </span>
+
           <span style={{ display: "flex" }}>
             <Typography variant="h5" className={classes.heading}>
               Current Price:
             </Typography>
-            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
+            &nbsp; &nbsp;
+            <Typography
+              variant="h5"
+              style={{
+                fontFamily: "Montserrat",
+              }}
+            >
               {symbol}{" "}
               {numberWithCommas(
-                coin?.market_data.current_price[currency.toLowerCase()])}
+                coin?.market_data.current_price[currency.toLowerCase()]
+              )}
             </Typography>
           </span>
           <span style={{ display: "flex" }}>
             <Typography variant="h5" className={classes.heading}>
-              Market Cap:{" "}
+              Market Cap:
             </Typography>
-
-            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
+            &nbsp; &nbsp;
+            <Typography
+              variant="h5"
+              style={{
+                fontFamily: "Montserrat",
+              }}
+            >
               {symbol}{" "}
               {numberWithCommas(
                 coin?.market_data.market_cap[currency.toLowerCase()]
@@ -154,13 +151,9 @@ const CoinPage = () => {
             </Typography>
           </span>
         </div>
-
       </div>
-
       <CoinInfo coin={coin} />
     </div>
-
-
   );
 };
 
