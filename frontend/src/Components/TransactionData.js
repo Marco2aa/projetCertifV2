@@ -2,7 +2,9 @@ import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { LinearProgress, Typography } from '@mui/material';
+import { BASE_URL } from '../config/api';
 
+// Modifications apportées pour rendre le nom des colonnes cohérent avec les données backend.
 const columns = [
     {
         field: 'id',
@@ -31,53 +33,71 @@ const columns = [
         field: 'createdAt',
         headerName: 'Executé le :',
         width: 200,
+        renderCell: (params) => {
+            const order = params.row;
+            const formattedDate = new Date(order.createdAt).toLocaleString();
+            return <div>{formattedDate}</div>; // Formatage de la date
+        },
     },
     {
-        field: 'walletName',
+        field: 'wallet',
         headerName: 'Wallet',
         width: 150,
         renderCell: (params) => {
             const order = params.row;
             return (
                 <div>
-                    {order.wallet?.name || ''}
+                    {order.wallet ? order.wallet.name : ''}
                 </div>
             );
         },
     },
     {
-        field: 'deviseName',
+        field: 'devise',
         headerName: 'Devise',
         width: 150,
         renderCell: (params) => {
             const order = params.row;
             return (
                 <div>
-                    {order.devise?.name || ''}
+                    {order.devise ? order.devise.name : ''}
                 </div>
             );
         },
     },
     {
-        field: 'deviseValeur',
-        headerName: 'Valeur',
+        field: 'deviseValue',
+        headerName: 'Valeur de la Devise',
         width: 150,
         renderCell: (params) => {
             const order = params.row;
             return (
                 <div>
-                    {order.devise?.valeur || ''}
+                    {order.deviseValue ? order.deviseValue.toFixed(5) : ''} {/* Valeur formatée à 5 décimales */}
                 </div>
             );
         },
     },
     {
-        field: 'stripeReceiptUrl',
+        field: 'cryptoPriceAtTransaction',
+        headerName: 'Prix Crypto',
+        width: 150,
+        renderCell: (params) => {
+            const order = params.row;
+            return (
+                <div>
+                    {order.cryptoPriceAtTransaction ? order.cryptoPriceAtTransaction.toFixed(5) : ''} {/* Prix de la crypto */}
+                </div>
+            );
+        },
+    },
+    {
+        field: 'stripe',
         headerName: 'Receipt URL',
         width: 250,
         renderCell: (params) => {
             const order = params.row;
-            const receiptUrl = order.stripe?.receipt_url;
+            const receiptUrl = order.stripe ? order.stripe.receipt_url : null;
             return (
                 <div>
                     {receiptUrl && <a href={receiptUrl}>Cliquez pour voir la facture</a>}
@@ -91,13 +111,13 @@ export default function TransactionData() {
 
     const [tableData, setTableData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState(''); // State pour gérer les messages d'erreur
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const fetchOrders = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('jwtToken');
-            const response = await axios.get(`https://localhost:8000/api/getorders`,
+            const response = await axios.get(`${BASE_URL}/api/getorders`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -108,7 +128,6 @@ export default function TransactionData() {
 
             const data = response.data;
 
-            // Vérification si le tableau est vide
             if (data.length === 0) {
                 setErrorMessage('Aucune transaction n\'a été effectuée pour le moment.');
             } else {
@@ -121,7 +140,6 @@ export default function TransactionData() {
         } catch (err) {
             console.error(err);
 
-            // Si on reçoit un statut 401, afficher le message d'erreur
             if (err.response && err.response.status === 401) {
                 setErrorMessage('Vous devez être connecté pour voir les transactions.');
             } else {
@@ -130,7 +148,7 @@ export default function TransactionData() {
 
             setLoading(false);
         }
-    }
+    };
 
     React.useEffect(() => {
         fetchOrders();
@@ -139,7 +157,6 @@ export default function TransactionData() {
     const rows = tableData;
 
     return (
-
         <div style={{
             width: '85%', display: 'flex',
             justifyContent: 'center',
@@ -150,9 +167,8 @@ export default function TransactionData() {
             fontFamily: 'Poppins'
         }}>
 
-            {loading && <LinearProgress style={{ width: '100%', position: 'relative', backgroundColor: 'orange' }} />}
 
-            {/* Si errorMessage est présent, l'afficher à la place du tableau */}
+
             {errorMessage ? (
                 <Typography variant="h6" color="error" style={{ marginTop: '20px' }}>
                     {errorMessage}

@@ -44,7 +44,9 @@ const Deposit = () => {
                         montantEuros: montantEuros.toFixed(2),
                         deviseId: parseInt(selectedValue.id),
                         email: username,
-                        walletId: parseInt(thisWallet.id)
+                        walletId: parseInt(thisWallet.id),
+                        type: "Dépôt"
+
                     },
                     {
                         headers: {

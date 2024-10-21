@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './RegisterForm/RegisterForm.css'
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { loadStripe } from '@stripe/stripe-js';
+import { BASE_URL } from '../config/api';
 
 
 function TabPanel(props) {
@@ -76,6 +77,10 @@ export default function BuyCrypto() {
     const [deviseSelected, setDeviseSelected] = useState(null);
     const [sessionId, setSessionId] = useState(null)
     const [username, setUsername] = useState(null)
+    const [availableCryptos, setAvailableCryptos] = useState([]);
+    const [amountToSell, setAmountToSell] = useState(0);
+    const [maxAmount, setMaxAmount] = useState(0);
+    const [selectedCrypto, setSelectedCrypto] = useState(null);
 
     const thisWallet = wallet.find(item => item.name === selectedWallet)
     console.log(thisWallet);
@@ -83,11 +88,7 @@ export default function BuyCrypto() {
 
     const handleBuyDeposit = async () => {
         const stripe = await loadStripe('pk_test_51Ovg9SK0rs45oKLrHtLQYiAIGDvnTmnLNl0PhVWSq7fUI5q9i4nrpGInw3rSf02dT9iSpZXOQzmUOTytWIBD2Kom00bcCSMTyd')
-
         const token = localStorage.getItem('jwtToken');
-
-
-
         try {
 
             const decodedToken = decodeJWT(token);
@@ -97,14 +98,17 @@ export default function BuyCrypto() {
             setUsername(username);
 
             const response = await axios.post(
-                `https://localhost:8000/api/create-checkout-session/buy-and-sell`,
+                `${BASE_URL}/api/create-checkout-session/buy-and-sell`,
                 {
                     cryptoId: parseInt(cryptoSelected.id),
                     email: username,
                     walletId: parseInt(thisWallet.id),
                     quantity: (amountToReceive.toFixed(5)),
                     amount: amount,
-                    deviseId: parseInt(deviseSelected.id)
+                    deviseId: parseInt(deviseSelected.id),
+                    deviseValue: deviseSelected.valeur,
+                    cryptoValue: cryptoSelected.current_price,
+                    type: "Achat"
 
                 },
                 {
@@ -123,6 +127,52 @@ export default function BuyCrypto() {
             console.error(error);
         }
 
+    };
+
+    const fetchUserCryptos = async (walletId) => {
+        const token = localStorage.getItem('jwtToken');
+        try {
+            const response = await axios.get(`${BASE_URL}/api/user-cryptos?walletId=${thisWallet.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+            console.log(wallet)
+            // Mettre à jour la liste des cryptos disponibles à la vente
+            setAvailableCryptos(response.data);
+        } catch (error) {
+            console.error('Error fetching user cryptos:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedWallet) {
+            fetchUserCryptos(selectedWallet.id);
+        }
+    }, [selectedWallet]);
+
+    const handleSellCrypto = async () => {
+        const token = localStorage.getItem('jwtToken');
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/api/create-sell-order`,
+                {
+                    cryptoId: selectedCrypto.id,
+                    walletId: selectedWallet.id,
+                    quantity: amountToSell,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                    },
+                }
+            );
+            console.log('Order created successfully:', response.data);
+        } catch (error) {
+            console.error('Error creating sell order:', error);
+        }
     };
 
     const decodeJWT = (token) => {
@@ -507,32 +557,37 @@ export default function BuyCrypto() {
                         </div>
                     </TabPanel>
                     <TabPanel value={value} index={1} dir={theme.direction}>
-                        <form
-                            className={classes.form}>
+                        <Box>
+                            <SelectWallet wallets={wallet} onSelect={handleSelectWallet} />
 
-                            <div className={classes.div}>
-                                <TextField
-                                    fullWidth
-                                    color='warning'
-                                    label="Depenser"
-                                    placeholder='Saisissez un montant'
-                                    type="text"
-                                />
-                                <TextField
-                                    fullWidth
-                                    color='warning'
-                                    label="Recevoir"
-                                    placeholder='0.00'
-                                    type="text"
+                            {/* Autocomplete pour choisir la crypto à vendre */}
+                            <Autocomplete
+                                options={availableCryptos}
+                                getOptionLabel={(option) => option.name}
+                                onChange={(event, newValue) => {
+                                    setSelectedCrypto(newValue);
+                                    setMaxAmount(newValue.balance); // Mettre à jour le montant maximum vendable
+                                }}
+                                renderInput={(params) => <TextField {...params} label="Cryptos disponibles" />}
+                            />
 
-                                />
-                            </div>
-                            <button
+                            <TextField
+                                label="Quantité à vendre"
+                                type="number"
+                                value={amountToSell}
+                                onChange={(e) => {
+                                    const value = parseFloat(e.target.value);
+                                    setAmountToSell(value);
+                                    setError(value > maxAmount);
+                                }}
+                                error={error}
+                                helperText={error ? `Vous ne pouvez pas vendre plus de ${maxAmount}` : ''}
+                            />
 
-                                className={classes.button}
-                            >Recevoir
-                            </button>
-                        </form>
+                            <Button onClick={handleSellCrypto} disabled={error || !amountToSell}>
+                                Vendre
+                            </Button>
+                        </Box>
                     </TabPanel>
                 </SwipeableViews>
             </ Box >

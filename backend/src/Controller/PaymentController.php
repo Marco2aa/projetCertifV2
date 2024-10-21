@@ -29,13 +29,11 @@ class PaymentController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $amount = $data['montantEuros'];
-
-
+        $deviseValue = $data['deviseValue'] ?? null; // Récupérer la valeur de la devise si fournie
 
         \Stripe\Stripe::setApiKey('sk_test_51Ovg9SK0rs45oKLry2Bm17nxBsh886BTtFXwPXjU91aiuuFs6M8osIjFEq5E4oCNdV42hZuufGzWsdsNfLdr0rL300eHmQCd2D');
 
         try {
-
             $session = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
@@ -51,21 +49,21 @@ class PaymentController extends AbstractController
                 'metadata' => [
                     'deviseId' => $data['deviseId'],
                     'userName' => $data['email'],
-                    'walletId' => $data['walletId']
+                    'walletId' => $data['walletId'],
+                    'deviseValue' => $deviseValue,
+                    'type' => $data['type']
                 ],
                 'mode' => 'payment',
                 'success_url' => 'https://example.com/success',
                 'cancel_url' => 'https://example.com/cancel',
             ]);
 
-
-
-
             return $this->json(['sessionId' => $session->id]);
         } catch (ApiErrorException $e) {
             return new JsonResponse(['error' => 'Error creating checkout session: ' . $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     #[Route('/webhook/payment', name: 'payment_succeeded', methods: ['POST'])]
     public function payementSucceeded(
@@ -75,6 +73,7 @@ class PaymentController extends AbstractController
         WalletService $walletService,
         UserRepository $userRepo,
         StripeRepository $stripeRepo,
+        CryptoRepository $cryptoRepository
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $eventType = $data['type'];
@@ -94,18 +93,25 @@ class PaymentController extends AbstractController
                 $metadata = $data['data']['object']['metadata'];
                 $deviseId = $metadata['deviseId'];
                 $walletId = $metadata['walletId'];
+                $type = $metadata['type'];
+                $crypto = $cryptoRepository->find($metadata['cryptoId']);
+                $deviseValue = $metadata['deviseValue'] ?? null; // Récupérer la valeur de la devise depuis les metadata
+                $cryptoValue = $metadata['cryptoValue'] ?? null;
                 $stripe = $stripeRepo->findOneBy(['id_stripe' => $data['data']['object']['payment_intent']]);
                 $user = $userRepo->findOneBy(['email' => $metadata['userName']]);
                 $amount = $data['data']['object']['amount_total'] / 100;
                 $walletService->updateWalletSolde($user, $walletId, $amount);
                 $orderService->createDepositOrder(
-                    'depot',
+                    $type,
                     $amount,
                     new \DateTimeImmutable(),
                     $walletId,
                     $user->getId(),
                     $deviseId,
-                    $stripe
+                    $deviseValue,
+                    $cryptoValue,
+                    $stripe,
+                    $crypto
                 );
             }
             return new JsonResponse(['message' => 'ok']);
@@ -113,8 +119,9 @@ class PaymentController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return  new JsonResponse(['message' => 'ok']);
+        return new JsonResponse(['message' => 'ok']);
     }
+
 
     #[Route('/api/create-checkout-session/buy-and-sell', name: 'create_checkout_session_buy_and_sell', methods: ['POST'])]
     public function createBuyCheckoutSession(Request $request, ProduitStripeRepository $productRepository, CryptoRepository $cryptoRepo, DeviseRepository $deviseRepo): JsonResponse
@@ -125,19 +132,16 @@ class PaymentController extends AbstractController
 
         try {
             $cryptoId = $data['cryptoId'];
-            // Trouver l'entité Crypto correspondante
             $crypto = $cryptoRepo->find($cryptoId);
             $devise = $deviseRepo->find($data['deviseId']);
 
-            // Vérifier si la Crypto existe
             if (!$crypto) {
                 throw new \Exception('Crypto not found');
             }
-            // Accéder à la relation ProduitStripe depuis l'entité Crypto
-            $produitStripe = $crypto->getProduitStripe();
 
-            // Extraire l'identifiant du produit
+            $produitStripe = $crypto->getProduitStripe();
             $productId = $produitStripe->getProduitId();
+
             $session = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
@@ -145,7 +149,6 @@ class PaymentController extends AbstractController
                         'currency' => 'eur',
                         'unit_amount' => round(($data['amount'] / $devise->getValeur()) * 100),
                         'product' => $productId,
-
                     ],
                     'quantity' => 1,
                 ]],
@@ -155,8 +158,11 @@ class PaymentController extends AbstractController
                     'walletId' => $data['walletId'],
                     'quantity' => $data['quantity'],
                     'eur_price' => ($data['amount'] / $devise->getValeur()) * 100,
-                    'this_price' => $crypto->getCurrentPrice(),
-
+                    'this_price' => $crypto->getCurrentPrice(), // Ajouter le prix de la crypto
+                    'cryptoValue' => $data['cryptoValue'], // Inclure la valeur de la crypto dans les metadata
+                    'deviseValue' => $data['deviseValue'], // Inclure la valeur de la devise dans les metadata
+                    'type' => $data['type'],
+                    'cryptoId' => $data['cryptoId']
                 ],
                 'mode' => 'payment',
                 'success_url' => 'https://example.com/success',
@@ -167,5 +173,22 @@ class PaymentController extends AbstractController
         } catch (ApiErrorException $e) {
             return new JsonResponse(['error' => 'Error creating checkout session: ' . $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    #[Route('/api/user/orders', methods: ['GET'])]
+    public function getUserOrdersWithDates(OrderService $orderService): JsonResponse
+    {
+        // Récupérer l'utilisateur par son ID
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        // Récupérer les ordres de l'utilisateur via le service
+        $ordersData = $orderService->getUserOrdersWithDates($user);
+
+        return new JsonResponse($ordersData, JsonResponse::HTTP_OK);
     }
 }

@@ -67,7 +67,6 @@ function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => {
       if (orderBy === '24h' || orderBy === 'volume') {
-        // Assurez-vous que les valeurs sont définies avant de les comparer
         if (!a[orderBy] || !b[orderBy]) {
           return 0;
         } else if (isNaN(parseFloat(a[orderBy])) || isNaN(parseFloat(b[orderBy]))) {
@@ -81,7 +80,6 @@ function getComparator(order, orderBy) {
     }
     : (a, b) => {
       if (orderBy === '24h' || orderBy === 'volume') {
-        // Assurez-vous que les valeurs sont définies avant de les comparer
         if (!a[orderBy] || !b[orderBy]) {
           return 0;
         } else if (isNaN(parseFloat(a[orderBy])) || isNaN(parseFloat(b[orderBy]))) {
@@ -228,7 +226,6 @@ export default function CategorieTable() {
         const data = response.data;
         allCategories = [...allCategories, ...data['hydra:member']];
       }
-
       setTableData(allCategories);
       console.log(allCategories)
     } catch (err) {

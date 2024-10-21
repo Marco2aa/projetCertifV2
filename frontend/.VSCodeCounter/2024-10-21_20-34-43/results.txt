@@ -1,0 +1,107 @@
+Date : 2024-10-21 20:34:43
+Directory : c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend
+Total : 66 files,  26039 codes, 105 comments, 623 blanks, all 26767 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          3 |     19,970 |          0 |          3 |     19,973 |
+| JavaScript |         57 |      5,943 |         82 |        573 |      6,598 |
+| CSS        |          4 |         68 |          0 |         13 |         81 |
+| Markdown   |          1 |         38 |          0 |         33 |         71 |
+| HTML       |          1 |         20 |         23 |          1 |         44 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                           | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                              |         66 |     26,039 |        105 |        623 |     26,767 |
+| . (Files)                                                                                                      |          3 |     19,983 |          0 |         35 |     20,018 |
+| public                                                                                                         |          2 |         45 |         23 |          2 |         70 |
+| src                                                                                                            |         61 |      6,011 |         82 |        586 |      6,679 |
+| src (Files)                                                                                                    |          4 |         97 |          0 |         13 |        110 |
+| src\Components                                                                                                 |         40 |      5,229 |         72 |        475 |      5,776 |
+| src\Components (Files)                                                                                         |         22 |      2,628 |         51 |        324 |      3,003 |
+| src\Components\Banner                                                                                          |          2 |        147 |          7 |         29 |        183 |
+| src\Components\Dashboard                                                                                       |         12 |      2,064 |          6 |         49 |      2,119 |
+| src\Components\DataGrid                                                                                        |          2 |        129 |          1 |         25 |        155 |
+| src\Components\RegisterForm                                                                                    |          2 |        261 |          7 |         48 |        316 |
+| src\Context                                                                                                    |          4 |        208 |          9 |         46 |        263 |
+| src\Pages                                                                                                      |         11 |        448 |          1 |         44 |        493 |
+| src\config                                                                                                     |          2 |         29 |          0 |          8 |         37 |
++----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                       | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\README.md                                     | Markdown   |         38 |          0 |         33 |         71 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\package-lock.json                             | JSON       |     19,881 |          0 |          1 |     19,882 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\package.json                                  | JSON       |         64 |          0 |          1 |         65 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\public\index.html                             | HTML       |         20 |         23 |          1 |         44 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\public\manifest.json                          | JSON       |         25 |          0 |          1 |         26 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\App.css                                   | CSS        |         12 |          0 |          3 |         15 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\App.js                                    | JavaScript |         61 |          0 |          5 |         66 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\ApexChart.js                   | JavaScript |        113 |          2 |          8 |        123 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Autocomplete.js                | JavaScript |         57 |          0 |          3 |         60 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Banner\Banner.js               | JavaScript |         44 |          7 |          9 |         60 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Banner\Carousel.js             | JavaScript |        103 |          0 |         20 |        123 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\BuyCrypto.js                   | JavaScript |        475 |          2 |         64 |        541 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\CategorieTable.js              | JavaScript |        353 |         15 |         45 |        413 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\CoinInfo.js                    | JavaScript |        112 |          0 |         12 |        124 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\CoinsTable.js                  | JavaScript |        219 |         10 |         21 |        250 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\ColorSchemeToggle.js | JavaScript |         54 |          0 |          2 |         56 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\CountrySelector.js   | JavaScript |        474 |          1 |          4 |        479 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\Dashboardheader.js   | JavaScript |         46 |          0 |          2 |         48 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\DropZone.js          | JavaScript |         46 |          1 |          2 |         49 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\EditorToolbar.js     | JavaScript |         40 |          0 |          2 |         42 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\FileUpload.js        | JavaScript |         72 |          0 |          2 |         74 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\MuiLogo.js           | JavaScript |         33 |          0 |          1 |         34 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\MyInfo.js            | JavaScript |          8 |          0 |          4 |         12 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\MyProfile.js         | JavaScript |        275 |          2 |         10 |        287 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\OrderList.js         | JavaScript |        200 |          1 |          4 |        205 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\OrderTable.js        | JavaScript |        535 |          1 |          8 |        544 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Dashboard\Sidebar.js           | JavaScript |        281 |          0 |          8 |        289 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\DataGrid\DataGrid.css          | CSS        |          6 |          0 |          1 |          7 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\DataGrid\DataGrid.js           | JavaScript |        123 |          1 |         24 |        148 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Deposit.js                     | JavaScript |        161 |          0 |         25 |        186 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Footer.js                      | JavaScript |          8 |          0 |          6 |         14 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\FormLayout.js                  | JavaScript |         20 |          0 |          7 |         27 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Header.js                      | JavaScript |        163 |          0 |         17 |        180 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\LoginForm.js                   | JavaScript |        111 |          1 |         10 |        122 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Navlink.js                     | JavaScript |         19 |          0 |          3 |         22 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\PasswordResetForm.js           | JavaScript |        107 |          0 |          8 |        115 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\PasswordResetRequestForm.js    | JavaScript |        101 |          0 |         11 |        112 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\RegisterForm\RegisterForm.css  | CSS        |         38 |          0 |          7 |         45 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\RegisterForm\RegisterForm.js   | JavaScript |        223 |          7 |         41 |        271 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\SelectButton.js                | JavaScript |         33 |          1 |          5 |         39 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\SelectWallet.js                | JavaScript |         60 |          0 |          9 |         69 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\StyledTabs.js                  | JavaScript |         72 |          0 |         11 |         83 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\TransactionData.js             | JavaScript |        177 |          1 |         17 |        195 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\UserDisplay.js                 | JavaScript |         34 |          0 |          8 |         42 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\Withdrawal.js                  | JavaScript |        147 |          0 |         15 |        162 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\useScript.js                   | JavaScript |         62 |         19 |         17 |         98 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Components\utils.js                       | JavaScript |         24 |          0 |          2 |         26 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Context\AuthContext.js                    | JavaScript |         95 |          4 |         20 |        119 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Context\CryptoContext.js                  | JavaScript |         28 |          0 |          7 |         35 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Context\ErrorBoundary.js                  | JavaScript |         19 |          0 |          8 |         27 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Context\UserContext.js                    | JavaScript |         66 |          5 |         11 |         82 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Buy.js                              | JavaScript |         20 |          0 |          5 |         25 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Categorie.js                        | JavaScript |         12 |          0 |          3 |         15 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\CoinPage.js                         | JavaScript |        149 |          1 |         10 |        160 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\DashBoardInfo.js                    | JavaScript |         35 |          0 |          1 |         36 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Dashboard.js                        | JavaScript |         98 |          0 |          3 |        101 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Homemap.js                          | JavaScript |         17 |          0 |          5 |         22 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Homepage.js                         | JavaScript |         16 |          0 |          5 |         21 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Login.js                            | JavaScript |         36 |          0 |          5 |         41 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\ProfileDashBoard.js                 | JavaScript |         35 |          0 |          1 |         36 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\ResetPassword.js                    | JavaScript |         18 |          0 |          3 |         21 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\Pages\Transaction.js                      | JavaScript |         12 |          0 |          3 |         15 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\config\api.js                             | JavaScript |         11 |          0 |          8 |         19 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\config\data.js                            | JavaScript |         18 |          0 |          0 |         18 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\index.css                                 | CSS        |         12 |          0 |          2 |         14 |
+| c:\Users\bmarc\OneDrive\Documents\GitHub\projetCertifV2\frontend\src\index.js                                  | JavaScript |         12 |          0 |          3 |         15 |
+| Total                                                                                                          |            |     26,039 |        105 |        623 |     26,767 |
++----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

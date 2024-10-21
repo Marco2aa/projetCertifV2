@@ -145,4 +145,38 @@ class Order
 
         return $this;
     }
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 5, nullable: true)]
+    private ?float $cryptoPriceAtTransaction = null;
+
+    // ... autres méthodes
+
+    public function getCryptoPriceAtTransaction(): ?float
+    {
+        return $this->cryptoPriceAtTransaction;
+    }
+
+    public function setCryptoPriceAtTransaction(?float $cryptoPriceAtTransaction): self
+    {
+        $this->cryptoPriceAtTransaction = $cryptoPriceAtTransaction;
+
+        return $this;
+    }
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 5, nullable: true)]
+    private ?float $deviseValue = null;
+
+
+
+    public function getDeviseValue(): ?float
+    {
+        return $this->deviseValue;
+    }
+
+    public function setDeviseValue(?float $deviseValue): static
+    {
+        $this->deviseValue = $deviseValue;
+
+        return $this;
+    }
 }
