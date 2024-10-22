@@ -114,48 +114,72 @@ const PortfolioChartWithMultipleCryptos = () => {
             // Ajouter la valeur actuelle de la cryptomonnaie
             cryptoValues.push({
                 timestamp,
-                value: firstOrderPassed ? price * currentQuantity : 0, // Si le premier ordre n'est pas passé, valeur = 0
+                [cryptoId]: firstOrderPassed ? price * currentQuantity : 0, // Si le premier ordre n'est pas passé, valeur = 0
             });
         });
 
         return cryptoValues;
     };
 
-    // Fonction pour fusionner les valeurs d'Ethereum dans le tableau de Bitcoin
-    const mergeCryptoValues = (bitcoinValues, ethereumValues) => {
-        const mergedData = [];
+    // Fusion des valeurs des cryptos dans un tableau basé sur la crypto avec le plus de données
+    const mergeCryptoValues = (primaryValues, secondaryValuesList) => {
+        const mergedData = [...primaryValues];
 
-        // Nombre de lignes dans le tableau de Bitcoin
-        const bitcoinLength = bitcoinValues.length;
-        const ethereumLength = ethereumValues.length;
+        secondaryValuesList.forEach(({ cryptoId, values }) => {
+            // Nombre de lignes dans le tableau principal
+            const primaryLength = mergedData.length;
+            const secondaryLength = values.length;
 
-        // Commencer à remplir les valeurs d'Ethereum à partir de la fin du tableau de Bitcoin
-        const ethStartIndex = bitcoinLength - ethereumLength;
+            // Insérer les valeurs de la crypto secondaire à partir de la fin du tableau principal
+            const secondaryStartIndex = primaryLength - secondaryLength;
 
-        bitcoinValues.forEach((btcValue, index) => {
-            let ethValue = 0;
-
-            // Si l'index est supérieur ou égal à ethStartIndex, insérer les valeurs d'Ethereum à partir de la fin
-            if (index >= ethStartIndex) {
-                ethValue = ethereumValues[index - ethStartIndex]?.value || 0;
-            }
-
-            mergedData.push({
-                x: btcValue.timestamp,
-                bitcoin: btcValue.value,
-                ethereum: ethValue,
+            mergedData.forEach((entry, index) => {
+                if (index >= secondaryStartIndex) {
+                    entry[cryptoId] = values[index - secondaryStartIndex]?.[cryptoId] || 0;
+                } else {
+                    entry[cryptoId] = 0; // Avant le premier ordre, la valeur est 0
+                }
             });
         });
 
         return mergedData;
     };
 
-    // Calcul des valeurs pour Bitcoin et Ethereum
-    const bitcoinValues = calculateCryptoValues('bitcoin');
-    const ethereumValues = calculateCryptoValues('ethereum');
+    // Calcul dynamique des valeurs pour toutes les cryptos
+    const allCryptoValues = {};
+    Object.keys(coinGeckoData).forEach(cryptoId => {
+        allCryptoValues[cryptoId] = calculateCryptoValues(cryptoId);
+    });
 
-    // Fusion des deux tableaux
-    const combinedData = mergeCryptoValues(bitcoinValues, ethereumValues);
+    // Vérification : s'assurer que allCryptoValues n'est pas vide
+    if (Object.keys(allCryptoValues).length === 0) {
+        return <div>Aucune donnée disponible pour les cryptomonnaies.</div>;
+    }
+
+    // Déterminer la cryptomonnaie avec le plus de lignes comme référence
+    const [primaryCryptoId, ...otherCryptos] = Object.keys(allCryptoValues)
+        .sort((a, b) => allCryptoValues[b].length - allCryptoValues[a].length);
+
+    // S'assurer que primaryValues est bien un tableau
+    const primaryValues = allCryptoValues[primaryCryptoId] || [];
+
+    // Liste des autres cryptomonnaies
+    const secondaryValuesList = otherCryptos.map(cryptoId => ({
+        cryptoId,
+        values: allCryptoValues[cryptoId] || []
+    }));
+
+    // Fusion des cryptos dans le tableau principal basé sur la crypto avec le plus de données
+    const combinedData = mergeCryptoValues(primaryValues, secondaryValuesList);
+
+    // Générer dynamiquement les séries du graphique pour chaque cryptomonnaie
+    const series = Object.keys(allCryptoValues).map(cryptoId => ({
+        dataKey: cryptoId,
+        label: cryptoId.charAt(0).toUpperCase() + cryptoId.slice(1),
+        labelPosition: 'end',
+        labelOffset: 10 + Object.keys(allCryptoValues).indexOf(cryptoId) * 10,
+        showMark: false // Ajuster l'espacement pour éviter les chevauchements
+    }));
 
     console.log("Combined data for chart:", combinedData);
 
@@ -165,22 +189,14 @@ const PortfolioChartWithMultipleCryptos = () => {
             <LineChart
                 dataset={combinedData}
                 xAxis={[{
-                    dataKey: 'x', label: 'Date', valueFormatter: (timestamp) => {
+                    dataKey: 'timestamp',
+                    label: 'Date',
+                    valueFormatter: (timestamp) => {
                         const date = new Date(timestamp);
                         return date.toLocaleDateString(); // Convertir le timestamp en une date lisible
                     }
-                }]} // Axe X basé sur les timestamps
-                series={[
-                    {
-                        dataKey: 'bitcoin', label: 'Bitcoin', showMark: false, labelPosition: 'end', // Positionner le label à la fin de la ligne
-                        labelOffset: 10,
-                    },
-                    {
-                        dataKey: 'ethereum', label: 'Ethereum', showMark: false, labelPosition: 'end', // Positionner le label à la fin de la ligne
-                        labelOffset: 25,
-                    },
-
-                ]}
+                }]}
+                series={series} // Séries dynamiques pour chaque cryptomonnaie
                 height={300}
                 margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
                 grid={{ vertical: true, horizontal: true }}
