@@ -5,63 +5,76 @@ const PortfolioChart = ({ coinGeckoData, symfonyOrders }) => {
     const [portfolioHistory, setPortfolioHistory] = useState([]);
 
     useEffect(() => {
-        const calculatePortfolioValue = () => {
+        const calculatePortfolioValues = () => {
             let portfolioValues = [];
-            let currentQuantity = 0;
 
-            // Trier les ordres Symfony par timestamp (au cas où)
-            const sortedOrders = symfonyOrders.sort((a, b) => a.createdAt - b.createdAt);
-            let nextOrderIndex = 0;
+            const cryptos = Object.keys(coinGeckoData); // Récupère tous les cryptoIds
 
-            // Parcourir les données de CoinGecko (timestamps et prix)
-            for (const [timestamp, price] of coinGeckoData) {
-                // Convertir timestamp CoinGecko en secondes (au cas où ils seraient en millisecondes)
-                const coinGeckoTimestamp = Math.floor(timestamp / 1000);
+            cryptos.forEach(cryptoId => {
+                let currentQuantity = 0;
+                const sortedOrders = symfonyOrders
+                    .filter(order => order.cryptoId === cryptoId)
+                    .sort((a, b) => a.createdAt - b.createdAt);
+                let nextOrderIndex = 0;
 
-                // Vérifier si on a des ordres à cette date ou avant
-                while (nextOrderIndex < sortedOrders.length && sortedOrders[nextOrderIndex].createdAt <= coinGeckoTimestamp) {
-                    const order = sortedOrders[nextOrderIndex];
+                coinGeckoData[cryptoId].forEach(([timestamp, price]) => {
+                    const coinGeckoTimestamp = Math.floor(timestamp / 1000);
 
-                    // Mettre à jour la quantité en fonction du type d'ordre (achat/vente)
-                    if (order.type === 'Achat') {
-                        currentQuantity += order.quantity;
-                    } else if (order.type === 'Vente') {
-                        currentQuantity -= order.quantity;
+                    while (nextOrderIndex < sortedOrders.length && sortedOrders[nextOrderIndex].createdAt <= coinGeckoTimestamp) {
+                        const order = sortedOrders[nextOrderIndex];
+
+                        if (order.type === 'Achat') {
+                            currentQuantity += order.quantity;
+                        } else if (order.type === 'Vente') {
+                            currentQuantity -= order.quantity;
+                        }
+
+                        nextOrderIndex++;
                     }
 
-                    // Passer à l'ordre suivant
-                    nextOrderIndex++;
-                }
+                    const portfolioValue = price * currentQuantity;
 
-                // Calculer la valeur du portefeuille pour ce timestamp
-                const portfolioValue = price * currentQuantity;
-
-                // Stocker la valeur et la date pour le graphique
-                portfolioValues.push({
-                    x: coinGeckoTimestamp,
-                    y: portfolioValue,
+                    portfolioValues.push({
+                        cryptoId, // Stocker l'ID de la crypto
+                        x: coinGeckoTimestamp,
+                        y: portfolioValue,
+                    });
                 });
-            }
+            });
 
-            // Mettre à jour le state avec les valeurs calculées
             setPortfolioHistory(portfolioValues);
-            console.log(portfolioHistory)
         };
 
-        calculatePortfolioValue();
+        calculatePortfolioValues();
     }, [coinGeckoData, symfonyOrders]);
 
+    // Diviser les données par cryptoId pour avoir plusieurs courbes
+    const groupedData = portfolioHistory.reduce((acc, dataPoint) => {
+        if (!acc[dataPoint.cryptoId]) {
+            acc[dataPoint.cryptoId] = [];
+        }
+        acc[dataPoint.cryptoId].push(dataPoint);
+        return acc;
+    }, {});
+
     return (
-        <div>
-            <h3>Valeur du portefeuille dans le temps</h3>
-            <LineChart
-                dataset={portfolioHistory}
-                xAxis={[{ dataKey: 'x' }]} // Les dates des ordres sur l'axe X
-                series={[{ dataKey: 'y' }]} // Les valeurs de l'ordre sur l'axe Y
-                height={300}
-                margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-                grid={{ vertical: true, horizontal: true }}
-            />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+            <div>
+                <h3>Valeur du portefeuille dans le temps</h3>
+                {Object.keys(groupedData).map(cryptoId => (
+                    <div key={cryptoId}>
+                        <h4>Crypto : {cryptoId}</h4>
+                        <LineChart
+                            dataset={groupedData[cryptoId]}
+                            xAxis={[{ dataKey: 'x' }]}
+                            series={[{ dataKey: 'y', showMark: false }]}
+                            height={300}
+                            margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+                            grid={{ vertical: true, horizontal: true }}
+                        />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
