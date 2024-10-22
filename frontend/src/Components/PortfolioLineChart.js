@@ -1,46 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { fetchCryptoPriceAtDate } from '../config/fetchCryptoPrice'; // La fonction pour récupérer les prix à des dates spécifiques
-import { SparkLineChart } from '@mui/x-charts';
 
-export default function PortfolioChart({ orders }) {
-    const [chartData, setChartData] = useState([]);
+const PortfolioChart = ({ coinGeckoData, symfonyOrders }) => {
+    const [portfolioHistory, setPortfolioHistory] = useState([]);
 
     useEffect(() => {
-        const calculatePortfolioValue = async () => {
-            let portfolioHistory = [];
+        const calculatePortfolioValue = () => {
+            let portfolioValues = [];
+            let currentQuantity = 0;
 
-            for (const order of orders) {
-                const { cryptoId, type, quantity, createdAt } = order;
+            // Trier les ordres Symfony par timestamp (au cas où)
+            const sortedOrders = symfonyOrders.sort((a, b) => a.createdAt - b.createdAt);
+            let nextOrderIndex = 0;
 
-                // Récupérer le prix de la crypto à la date de l'ordre
-                const cryptoPriceAtDate = await fetchCryptoPriceAtDate(cryptoId, createdAt);
+            // Parcourir les données de CoinGecko (timestamps et prix)
+            for (const [timestamp, price] of coinGeckoData) {
+                // Convertir timestamp CoinGecko en secondes (au cas où ils seraient en millisecondes)
+                const coinGeckoTimestamp = Math.floor(timestamp / 1000);
 
-                // Calculer la valeur de l'ordre
-                const valueAtTime = cryptoPriceAtDate * quantity;
+                // Vérifier si on a des ordres à cette date ou avant
+                while (nextOrderIndex < sortedOrders.length && sortedOrders[nextOrderIndex].createdAt <= coinGeckoTimestamp) {
+                    const order = sortedOrders[nextOrderIndex];
 
-                // Si c'est un achat, on ajoute à la valeur totale, si c'est une vente, on soustrait
-                portfolioHistory.push({
-                    x: new Date(createdAt).toLocaleDateString(),
-                    y: type === 'Achat' ? valueAtTime : -valueAtTime, // Achat +, Vente -
+                    // Mettre à jour la quantité en fonction du type d'ordre (achat/vente)
+                    if (order.type === 'Achat') {
+                        currentQuantity += order.quantity;
+                    } else if (order.type === 'Vente') {
+                        currentQuantity -= order.quantity;
+                    }
+
+                    // Passer à l'ordre suivant
+                    nextOrderIndex++;
+                }
+
+                // Calculer la valeur du portefeuille pour ce timestamp
+                const portfolioValue = price * currentQuantity;
+
+                // Stocker la valeur et la date pour le graphique
+                portfolioValues.push({
+                    x: coinGeckoTimestamp,
+                    y: portfolioValue,
                 });
             }
 
-            setChartData(portfolioHistory);
-            console.log(chartData);
+            // Mettre à jour le state avec les valeurs calculées
+            setPortfolioHistory(portfolioValues);
+            console.log(portfolioHistory)
         };
 
         calculatePortfolioValue();
-    }, [orders]);
+    }, [coinGeckoData, symfonyOrders]);
 
     return (
-        <LineChart
-            dataset={chartData}
-            xAxis={[{ dataKey: 'x', label: 'Date' }]} // Les dates des ordres sur l'axe X
-            series={[{ dataKey: 'y', label: 'Valeur du portefeuille en €' }]} // Les valeurs de l'ordre sur l'axe Y
-            height={300}
-            margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-            grid={{ vertical: true, horizontal: true }}
-        />
+        <div>
+            <h3>Valeur du portefeuille dans le temps</h3>
+            <LineChart
+                dataset={portfolioHistory}
+                xAxis={[{ dataKey: 'x' }]} // Les dates des ordres sur l'axe X
+                series={[{ dataKey: 'y' }]} // Les valeurs de l'ordre sur l'axe Y
+                height={300}
+                margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+                grid={{ vertical: true, horizontal: true }}
+            />
+        </div>
     );
-}
+};
+
+export default PortfolioChart;

@@ -125,10 +125,10 @@ class OrderService
             // Vérifier que l'ordre a bien une crypto associée
             if ($crypto) {
                 $ordersData[] = [
-                    'cryptoId' => $crypto->getSymbol(),
+                    'cryptoId' => $crypto->getIdenitifiant(),
                     'type' => $order->getType(),
-                    'quantity' => $order->getQuantity(),
-                    'createdAt' => $order->getCreatedAt(),
+                    'quantity' => (($order->getQuantity() / $order->getDeviseValue()) / $order->getCryptoPriceAtTransaction()),
+                    'createdAt' => $order->getCreatedAt()->getTimestamp(),
                     'cryptoPriceAtOrder' => $order->getCryptoPriceAtTransaction(), // Ajout du prix au moment de l'ordre
                 ];
             }

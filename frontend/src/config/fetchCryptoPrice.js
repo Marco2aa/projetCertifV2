@@ -1,24 +1,28 @@
 import axios from 'axios';
 import { BASE_URL } from '../config/api';
 
-export const fetchCryptoPriceAtDate = async (cryptoId, date, currency = 'eur') => {
-    // Convertir la date en timestamp Unix (secondes)
-    const timestamp = Math.floor(new Date(date).getTime() / 1000);
+const convertDateToUnixTimestamp = (date) => {
+    return Math.floor(new Date(date).getTime() / 1000); // Convertir la date en secondes
+};
 
+// Fonction pour récupérer les prix d'une crypto sur une période définie
+export const fetchCryptoHistoricalData = async (cryptoId, startDate) => {
     try {
+        // Convertir en timestamp UNIX
+        const toTimestamp = Math.floor(Date.now() / 1000); // Date actuelle en timestamp UNIX
+
         const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart/range`, {
             params: {
-                vs_currency: currency,
-                from: timestamp,
-                to: timestamp,
+                vs_currency: 'eur', // Monnaie de référence
+                from: startDate, // Date de début en timestamp UNIX
+                to: toTimestamp, // Date actuelle en timestamp UNIX
             },
         });
-
-        const price = response.data.prices[0][1]; // Le prix à cette date
-        return price;
+        console.log(response.data.prices);
+        return response.data.prices; // Retourne les données de prix historiques
     } catch (error) {
-        console.error('Erreur lors de la récupération du prix de la crypto :', error);
-        return null;
+        console.error('Erreur lors de la récupération des données historiques:', error);
+        throw error;
     }
 };
 

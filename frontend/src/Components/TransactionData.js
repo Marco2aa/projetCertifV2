@@ -4,7 +4,6 @@ import axios from 'axios';
 import { LinearProgress, Typography } from '@mui/material';
 import { BASE_URL } from '../config/api';
 
-// Modifications apportées pour rendre le nom des colonnes cohérent avec les données backend.
 const columns = [
     {
         field: 'id',
@@ -36,7 +35,7 @@ const columns = [
         renderCell: (params) => {
             const order = params.row;
             const formattedDate = new Date(order.createdAt).toLocaleString();
-            return <div>{formattedDate}</div>; // Formatage de la date
+            return <div>{formattedDate}</div>;
         },
     },
     {
