@@ -142,6 +142,17 @@ const PortfolioChartWithMultipleCryptos = () => {
             });
         });
 
+        // Calculer le total des cryptos à chaque timestamp en additionnant toutes les colonnes (sauf le timestamp)
+        mergedData.forEach(entry => {
+            let total = 0;
+            Object.keys(entry).forEach(key => {
+                if (key !== 'timestamp') { // On ne somme pas les timestamps
+                    total += entry[key] || 0;
+                }
+            });
+            entry.total = total; // Ajouter la clé 'total'
+        });
+
         return mergedData;
     };
 
@@ -173,13 +184,22 @@ const PortfolioChartWithMultipleCryptos = () => {
     const combinedData = mergeCryptoValues(primaryValues, secondaryValuesList);
 
     // Générer dynamiquement les séries du graphique pour chaque cryptomonnaie
-    const series = Object.keys(allCryptoValues).map(cryptoId => ({
-        dataKey: cryptoId,
-        label: cryptoId.charAt(0).toUpperCase() + cryptoId.slice(1),
-        labelPosition: 'end',
-        labelOffset: 10 + Object.keys(allCryptoValues).indexOf(cryptoId) * 10,
-        showMark: false // Ajuster l'espacement pour éviter les chevauchements
-    }));
+    const series = [
+        ...Object.keys(allCryptoValues).map(cryptoId => ({
+            dataKey: cryptoId,
+            label: cryptoId.charAt(0).toUpperCase() + cryptoId.slice(1),
+            labelPosition: 'end',
+            labelOffset: 10 + Object.keys(allCryptoValues).indexOf(cryptoId) * 10,
+            showMark: false
+        })),
+        {
+            dataKey: 'total', // Nouvelle clé pour la somme des cryptos
+            label: 'Total',
+            labelPosition: 'end',
+            labelOffset: 30,
+            showMark: false
+        }
+    ];
 
     console.log("Combined data for chart:", combinedData);
 
@@ -196,7 +216,7 @@ const PortfolioChartWithMultipleCryptos = () => {
                         return date.toLocaleDateString(); // Convertir le timestamp en une date lisible
                     }
                 }]}
-                series={series} // Séries dynamiques pour chaque cryptomonnaie
+                series={series} // Séries dynamiques pour chaque cryptomonnaie et le total
                 height={300}
                 margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
                 grid={{ vertical: true, horizontal: true }}
