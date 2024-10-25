@@ -69,7 +69,7 @@ const PortfolioChart = ({ coinGeckoData, symfonyOrders }) => {
                             xAxis={[{ dataKey: 'x' }]}
                             series={[{ dataKey: 'y', showMark: false }]}
                             height={300}
-                            margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+                            margin={{ left: 60, right: 30, top: 30, bottom: 30 }}
                             grid={{ vertical: true, horizontal: true }}
                         />
                     </div>

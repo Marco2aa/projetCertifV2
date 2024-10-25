@@ -136,4 +136,77 @@ class OrderService
 
         return $ordersData;
     }
+
+
+
+
+    public function getPortfolioData(User $user): array
+    {
+        // Récupérer tous les ordres de l'utilisateur
+        $orders = $this->orderRepository->findBy(['user' => $user]);
+
+        // Tableau pour stocker le total de chaque crypto
+        $cryptoTotals = [];
+        $fiatBalance = 0;
+        $cryptoByToken = [];
+
+        foreach ($orders as $order) {
+            // Récupérer le type d'ordre avant de l'utiliser
+            $orderType = $order->getType(); // Assure que $orderType est bien défini
+
+            // Vérifie que l'ordre a bien une cryptomonnaie associée
+            $crypto = $order->getCrypto();
+            if ($crypto !== null) {
+                $cryptoId = $crypto->getName();
+                $quantity = $order->getQuantity();
+                $deviseValue = $order->getDeviseValue(); // Valeur de la devise pour conversion en euros
+                $cryptoPriceAtTransaction = $order->getCryptoPriceAtTransaction(); // Prix de la crypto lors de la transaction
+
+                // Gestion des cryptomonnaies si crypto_id n'est pas NULL
+                if ($cryptoPriceAtTransaction !== null) {
+                    $cryptoAmount = ($quantity / $deviseValue);
+
+                    if ($orderType === 'Achat') {
+                        if (!isset($cryptoTotals[$cryptoId])) {
+                            $cryptoTotals[$cryptoId] = 0;
+                            $cryptoByToken[$cryptoId] = 0;
+                        }
+                        $cryptoTotals[$cryptoId] += $cryptoAmount;
+                        $cryptoByToken[$cryptoId] += $cryptoAmount / $cryptoPriceAtTransaction;
+                    } elseif ($orderType === 'Vente') {
+                        if (!isset($cryptoTotals[$cryptoId])) {
+                            $cryptoTotals[$cryptoId] = 0;
+                            $cryptoByToken[$cryptoId] = 0;
+                        }
+                        $cryptoTotals[$cryptoId] -= $cryptoAmount;
+                        $cryptoByToken[$cryptoId] -= $cryptoAmount / $cryptoPriceAtTransaction;
+                    }
+                }
+            }
+
+            // Gestion du solde fiat (en euros) pour les ordres "Achat Solde", "Vente" et "Dépot"
+            if ($orderType === 'Achat Solde' && $deviseValue !== null) {
+                $convertedPrice = $quantity / $deviseValue; // Convertir le montant en euros
+                $fiatBalance -= $convertedPrice; // Diminuer le solde fiat en fonction de l'achat solde
+            }
+
+            // Pour les ordres de type "Dépot", on utilise directement la quantité
+            if ($orderType === 'Dépot' || $orderType === 'depot') {
+                $fiatBalance += $order->getQuantity(); // Ajouter directement la quantité au solde fiat
+            }
+
+            // Pour les ordres de type "Vente", on ajoute au solde fiat
+            if ($orderType === 'Vente' && $deviseValue !== null) {
+                $convertedPrice = $quantity / $deviseValue; // Convertir le montant en euros
+                $fiatBalance += $convertedPrice; // Augmenter le solde fiat en fonction de la vente
+            }
+        }
+
+        // Retourner les données sous la forme d'un tableau : cryptos et solde fiat
+        return [
+            'cryptoTotals' => $cryptoTotals, // Les quantités de chaque crypto
+            'cryptoByToken' => $cryptoByToken,
+            'fiatBalance' => $fiatBalance, // Le solde en euros
+        ];
+    }
 }

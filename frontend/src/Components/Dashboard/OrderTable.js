@@ -34,201 +34,21 @@ import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
-const rows = [
-    {
-        id: 'INV-1234',
-        date: 'Feb 3, 2023',
-        status: 'Refunded',
-        customer: {
-            initial: 'O',
-            name: 'Olivia Ryhe',
-            email: 'olivia@email.com',
-        },
-    },
-    {
-        id: 'INV-1233',
-        date: 'Feb 3, 2023',
-        status: 'Paid',
-        customer: {
-            initial: 'S',
-            name: 'Steve Hampton',
-            email: 'steve.hamp@email.com',
-        },
-    },
-    {
-        id: 'INV-1232',
-        date: 'Feb 3, 2023',
-        status: 'Refunded',
-        customer: {
-            initial: 'C',
-            name: 'Ciaran Murray',
-            email: 'ciaran.murray@email.com',
-        },
-    },
-    {
-        id: 'INV-1231',
-        date: 'Feb 3, 2023',
-        status: 'Refunded',
-        customer: {
-            initial: 'M',
-            name: 'Maria Macdonald',
-            email: 'maria.mc@email.com',
-        },
-    },
-    {
-        id: 'INV-1230',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'C',
-            name: 'Charles Fulton',
-            email: 'fulton@email.com',
-        },
-    },
-    {
-        id: 'INV-1229',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'J',
-            name: 'Jay Hooper',
-            email: 'hooper@email.com',
-        },
-    },
-    {
-        id: 'INV-1228',
-        date: 'Feb 3, 2023',
-        status: 'Refunded',
-        customer: {
-            initial: 'K',
-            name: 'Krystal Stevens',
-            email: 'k.stevens@email.com',
-        },
-    },
-    {
-        id: 'INV-1227',
-        date: 'Feb 3, 2023',
-        status: 'Paid',
-        customer: {
-            initial: 'S',
-            name: 'Sachin Flynn',
-            email: 's.flyn@email.com',
-        },
-    },
-    {
-        id: 'INV-1226',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'B',
-            name: 'Bradley Rosales',
-            email: 'brad123@email.com',
-        },
-    },
-    {
-        id: 'INV-1225',
-        date: 'Feb 3, 2023',
-        status: 'Paid',
-        customer: {
-            initial: 'O',
-            name: 'Olivia Ryhe',
-            email: 'olivia@email.com',
-        },
-    },
-    {
-        id: 'INV-1224',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'S',
-            name: 'Steve Hampton',
-            email: 'steve.hamp@email.com',
-        },
-    },
-    {
-        id: 'INV-1223',
-        date: 'Feb 3, 2023',
-        status: 'Paid',
-        customer: {
-            initial: 'C',
-            name: 'Ciaran Murray',
-            email: 'ciaran.murray@email.com',
-        },
-    },
-    {
-        id: 'INV-1221',
-        date: 'Feb 3, 2023',
-        status: 'Refunded',
-        customer: {
-            initial: 'M',
-            name: 'Maria Macdonald',
-            email: 'maria.mc@email.com',
-        },
-    },
-    {
-        id: 'INV-1220',
-        date: 'Feb 3, 2023',
-        status: 'Paid',
-        customer: {
-            initial: 'C',
-            name: 'Charles Fulton',
-            email: 'fulton@email.com',
-        },
-    },
-    {
-        id: 'INV-1219',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'J',
-            name: 'Jay Hooper',
-            email: 'hooper@email.com',
-        },
-    },
-    {
-        id: 'INV-1218',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'K',
-            name: 'Krystal Stevens',
-            email: 'k.stevens@email.com',
-        },
-    },
-    {
-        id: 'INV-1217',
-        date: 'Feb 3, 2023',
-        status: 'Paid',
-        customer: {
-            initial: 'S',
-            name: 'Sachin Flynn',
-            email: 's.flyn@email.com',
-        },
-    },
-    {
-        id: 'INV-1216',
-        date: 'Feb 3, 2023',
-        status: 'Cancelled',
-        customer: {
-            initial: 'B',
-            name: 'Bradley Rosales',
-            email: 'brad123@email.com',
-        },
-    },
-];
+import { BASE_URL } from '../../config/api';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
+
 
 function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
+    if (b[orderBy] < a[orderBy]) return -1;
+    if (b[orderBy] > a[orderBy]) return 1;
     return 0;
 }
-
-
 
 function getComparator(order, orderBy) {
     return order === 'desc'
@@ -238,120 +58,54 @@ function getComparator(order, orderBy) {
 
 function RowMenu() {
     return (
-        <Dropdown>
-            <MenuButton
-                slots={{ root: IconButton }}
-                slotProps={{ root: { variant: 'plain', color: 'neutral', size: 'sm' } }}
-            >
-                <MoreHorizRoundedIcon />
-            </MenuButton>
-            <Menu size="sm" sx={{ minWidth: 140 }}>
-                <MenuItem>Edit</MenuItem>
-                <MenuItem>Rename</MenuItem>
-                <MenuItem>Move</MenuItem>
-                <Divider />
-                <MenuItem color="danger">Delete</MenuItem>
-            </Menu>
-        </Dropdown>
+        <IconButton variant="plain" color="neutral" size="sm">
+            <MoreHorizRoundedIcon />
+        </IconButton>
     );
 }
+
 export default function OrderTable() {
-    const [order, setOrder] = React.useState('desc');
-    const [selected, setSelected] = React.useState([]);
-    const [open, setOpen] = React.useState(false);
-    const renderFilters = () => (
-        <React.Fragment>
-            <FormControl size="sm">
-                <FormLabel>Status</FormLabel>
-                <Select
-                    size="sm"
-                    placeholder="Filter by status"
-                    slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}
-                >
-                    <Option value="paid">Paid</Option>
-                    <Option value="pending">Pending</Option>
-                    <Option value="refunded">Refunded</Option>
-                    <Option value="cancelled">Cancelled</Option>
-                </Select>
-            </FormControl>
-            <FormControl size="sm">
-                <FormLabel>Category</FormLabel>
-                <Select size="sm" placeholder="All">
-                    <Option value="all">All</Option>
-                    <Option value="refund">Refund</Option>
-                    <Option value="purchase">Purchase</Option>
-                    <Option value="debit">Debit</Option>
-                </Select>
-            </FormControl>
-            <FormControl size="sm">
-                <FormLabel>Customer</FormLabel>
-                <Select size="sm" placeholder="All">
-                    <Option value="all">All</Option>
-                    <Option value="olivia">Olivia Rhye</Option>
-                    <Option value="steve">Steve Hampton</Option>
-                    <Option value="ciaran">Ciaran Murray</Option>
-                    <Option value="marina">Marina Macdonald</Option>
-                    <Option value="charles">Charles Fulton</Option>
-                    <Option value="jay">Jay Hoper</Option>
-                </Select>
-            </FormControl>
-        </React.Fragment>
-    );
+    const [order, setOrder] = useState('desc');
+    const [selected, setSelected] = useState([]);
+    const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Récupérer les données depuis l'API
+    const fetchOrders = async () => {
+        try {
+            const token = localStorage.getItem('jwtToken');
+            const response = await axios.get(`${BASE_URL}/api/getorders`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/ld+json',
+                },
+            });
+            const orders = response.data;
+            if (Array.isArray(orders)) {
+                setRows(orders);
+            } else {
+                console.warn("La réponse ne contient pas de tableau d'ordres :", orders);
+                setRows([]);
+            }
+        } catch (err) {
+            console.error("Erreur lors de la récupération des données d'ordre:", err);
+            setError('Erreur lors de la récupération des données');
+            setRows([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    if (loading) return <div>Chargement...</div>;
+    if (error) return <div>{error}</div>;
+
     return (
         <React.Fragment>
-            <Sheet
-                className="SearchAndFilters-mobile"
-                sx={{ display: { xs: 'flex', sm: 'none' }, my: 1, gap: 1 }}
-            >
-                <Input
-                    size="sm"
-                    placeholder="Search"
-                    startDecorator={<SearchIcon />}
-                    sx={{ flexGrow: 1 }}
-                />
-                <IconButton
-                    size="sm"
-                    variant="outlined"
-                    color="neutral"
-                    onClick={() => setOpen(true)}
-                >
-                    <FilterAltIcon />
-                </IconButton>
-                <Modal open={open} onClose={() => setOpen(false)}>
-                    <ModalDialog aria-labelledby="filter-modal" layout="fullscreen">
-                        <ModalClose />
-                        <Typography id="filter-modal" level="h2">
-                            Filters
-                        </Typography>
-                        <Divider sx={{ my: 2 }} />
-                        <Sheet sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {renderFilters()}
-                            <Button color="primary" onClick={() => setOpen(false)}>
-                                Submit
-                            </Button>
-                        </Sheet>
-                    </ModalDialog>
-                </Modal>
-            </Sheet>
-            <Box
-                className="SearchAndFilters-tabletUp"
-                sx={{
-                    borderRadius: 'sm',
-                    py: 2,
-                    display: { xs: 'none', sm: 'flex' },
-                    flexWrap: 'wrap',
-                    gap: 1.5,
-                    '& > *': {
-                        minWidth: { xs: '120px', md: '160px' },
-                    },
-                }}
-            >
-                <FormControl sx={{ flex: 1 }} size="sm">
-                    <FormLabel>Search for order</FormLabel>
-                    <Input size="sm" placeholder="Search" startDecorator={<SearchIcon />} />
-                </FormControl>
-                {renderFilters()}
-            </Box>
             <Sheet
                 className="OrderTableContainer"
                 variant="outlined"
@@ -381,9 +135,7 @@ export default function OrderTable() {
                             <th style={{ width: 48, textAlign: 'center', padding: '12px 6px' }}>
                                 <Checkbox
                                     size="sm"
-                                    indeterminate={
-                                        selected.length > 0 && selected.length !== rows.length
-                                    }
+                                    indeterminate={selected.length > 0 && selected.length !== rows.length}
                                     checked={selected.length === rows.length}
                                     onChange={(event) => {
                                         setSelected(
@@ -398,33 +150,12 @@ export default function OrderTable() {
                                     sx={{ verticalAlign: 'text-bottom' }}
                                 />
                             </th>
-                            <th style={{ width: 120, padding: '12px 6px' }}>
-                                <Link
-                                    underline="none"
-                                    color="primary"
-                                    component="button"
-                                    onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-                                    endDecorator={<ArrowDropDownIcon />}
-                                    sx={[
-                                        {
-                                            fontWeight: 'lg',
-                                            '& svg': {
-                                                transition: '0.2s',
-                                                transform:
-                                                    order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
-                                            },
-                                        },
-                                        order === 'desc'
-                                            ? { '& svg': { transform: 'rotate(0deg)' } }
-                                            : { '& svg': { transform: 'rotate(180deg)' } },
-                                    ]}
-                                >
-                                    Invoice
-                                </Link>
-                            </th>
+                            <th style={{ width: 120, padding: '12px 6px' }}>ID</th>
                             <th style={{ width: 140, padding: '12px 6px' }}>Date</th>
-                            <th style={{ width: 140, padding: '12px 6px' }}>Status</th>
-                            <th style={{ width: 240, padding: '12px 6px' }}>Customer</th>
+                            <th style={{ width: 140, padding: '12px 6px' }}>Type</th>
+                            <th style={{ width: 140, padding: '12px 6px' }}>Montant</th>
+                            <th style={{ width: 140, padding: '12px 6px' }}>Devise</th>
+                            <th style={{ width: 140, padding: '12px 6px' }}>Reçu</th>
                             <th style={{ width: 140, padding: '12px 6px' }}> </th>
                         </tr>
                     </thead>
@@ -443,7 +174,6 @@ export default function OrderTable() {
                                                     : ids.filter((itemId) => itemId !== row.id),
                                             );
                                         }}
-                                        slotProps={{ checkbox: { sx: { textAlign: 'left' } } }}
                                         sx={{ verticalAlign: 'text-bottom' }}
                                     />
                                 </td>
@@ -451,94 +181,66 @@ export default function OrderTable() {
                                     <Typography level="body-xs">{row.id}</Typography>
                                 </td>
                                 <td>
-                                    <Typography level="body-xs">{row.date}</Typography>
+                                    <Typography level="body-xs">
+                                        {new Date(row.createdAt).toLocaleDateString()}
+                                    </Typography>
                                 </td>
                                 <td>
                                     <Chip
                                         variant="soft"
                                         size="sm"
-                                        startDecorator={
-                                            {
-                                                Paid: <CheckRoundedIcon />,
-                                                Refunded: <AutorenewRoundedIcon />,
-                                                Cancelled: <BlockIcon />,
-                                            }[row.status]
-                                        }
                                         color={
                                             {
-                                                Paid: 'success',
-                                                Refunded: 'neutral',
-                                                Cancelled: 'danger',
-                                            }[row.status]
+                                                depot: 'warning',
+                                                Achat: 'success',
+                                                Vente: 'info',
+                                                Retrait: 'danger',
+                                            }[row.type] || 'neutral'
+                                        }
+                                        startDecorator={
+                                            {
+                                                depot: <AddCircleOutlineIcon />,
+                                                achat: <ArrowUpwardIcon />,
+                                                vente: <ArrowDownwardIcon />,
+                                                retrait: <RemoveCircleOutlineIcon />,
+                                            }[row.type] || null
                                         }
                                     >
-                                        {row.status}
+                                        {row.type}
                                     </Chip>
                                 </td>
                                 <td>
-                                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Avatar size="sm">{row.customer.initial}</Avatar>
-                                        <div>
-                                            <Typography level="body-xs">{row.customer.name}</Typography>
-                                            <Typography level="body-xs">{row.customer.email}</Typography>
-                                        </div>
-                                    </Box>
+                                    <Typography level="body-xs">{row.quantity}</Typography>
                                 </td>
                                 <td>
-                                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Link level="body-xs" component="button">
-                                            Download
+                                    <Typography level="body-xs">
+                                        {row.devise ? `${row.devise.name} (${row.devise.valeur})` : 'N/A'}
+                                    </Typography>
+                                </td>
+                                <td>
+                                    {row.stripe && row.stripe.receipt_url ? (
+                                        <Link
+                                            level="body-xs"
+                                            href={row.stripe.receipt_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            Reçu Stripe
                                         </Link>
-                                        <RowMenu />
-                                    </Box>
+                                    ) : (
+                                        <Typography level="body-xs" color="neutral">
+                                            Non disponible
+                                        </Typography>
+                                    )}
+                                </td>
+                                <td>
+                                    <RowMenu />
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
             </Sheet>
-            <Box
-                className="Pagination-laptopUp"
-                sx={{
-                    pt: 2,
-                    gap: 1,
-                    [`& .${iconButtonClasses.root}`]: { borderRadius: '50%' },
-                    display: {
-                        xs: 'none',
-                        md: 'flex',
-                    },
-                }}
-            >
-                <Button
-                    size="sm"
-                    variant="outlined"
-                    color="neutral"
-                    startDecorator={<KeyboardArrowLeftIcon />}
-                >
-                    Previous
-                </Button>
-
-                <Box sx={{ flex: 1 }} />
-                {['1', '2', '3', '…', '8', '9', '10'].map((page) => (
-                    <IconButton
-                        key={page}
-                        size="sm"
-                        variant={Number(page) ? 'outlined' : 'plain'}
-                        color="neutral"
-                    >
-                        {page}
-                    </IconButton>
-                ))}
-                <Box sx={{ flex: 1 }} />
-                <Button
-                    size="sm"
-                    variant="outlined"
-                    color="neutral"
-                    endDecorator={<KeyboardArrowRightIcon />}
-                >
-                    Next
-                </Button>
-            </Box>
         </React.Fragment>
     );
 }

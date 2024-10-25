@@ -218,7 +218,8 @@ const PortfolioChartWithMultipleCryptos = () => {
                 }]}
                 series={series} // Séries dynamiques pour chaque cryptomonnaie et le total
                 height={300}
-                margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+                margin={{ left: 60, right: 30, top: 30, bottom: 30 }}
+
                 grid={{ vertical: true, horizontal: true }}
             />
         </div>

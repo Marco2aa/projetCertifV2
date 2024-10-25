@@ -126,6 +126,7 @@ export default function TransactionData() {
             );
 
             const data = response.data;
+            console.log(data)
 
             if (data.length === 0) {
                 setErrorMessage('Aucune transaction n\'a été effectuée pour le moment.');
