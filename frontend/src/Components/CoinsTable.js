@@ -93,7 +93,7 @@ const CoinsTable = () => {
         <Container style={{ textAlign: "center" }}>
 
             <Typography variant='h4' style={{ margin: 18, fontFamily: 'Montserrat' }}>
-                CryptoMonnaies par part de marché
+                CryptoMonnaies par parts de marché
             </Typography>
             <Box
                 sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "flex-start", gap: 2 }}

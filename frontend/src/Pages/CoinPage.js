@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { CryptoState } from '../Context/CryptoContext.js';
 import { makeStyles } from '@mui/styles';
-import { LinearProgress, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { LinearProgress, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import CoinInfo from '../Components/CoinInfo.js';
 import { numberWithCommas } from '../Components/Banner/Carousel.js';
@@ -13,18 +11,15 @@ import { SingleCoin } from '../config/api.js';
 const CoinPage = () => {
   const { id } = useParams();
   const [coin, setCoin] = useState();
-
   const { currency, symbol } = CryptoState();
 
   const fetchCoin = async () => {
     const { data } = await axios.get(SingleCoin(id));
-    console.log(data)
     setCoin(data);
   };
 
   useEffect(() => {
     fetchCoin();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const useStyles = makeStyles((theme) => ({
@@ -64,23 +59,37 @@ const CoinPage = () => {
       padding: 25,
       paddingTop: 10,
       width: "100%",
-      [theme.breakpoints.down("md")]: {
-        display: "flex",
-        justifyContent: "space-around",
+      display: "flex",
+      gap: "10px",
+      flexDirection: "column",
+      [theme.breakpoints.up("md")]: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
       },
       [theme.breakpoints.down("sm")]: {
-        flexDirection: "column",
         alignItems: "center",
       },
       [theme.breakpoints.down("xs")]: {
         alignItems: "start",
       },
     },
+    gaugeContainer: {
+      width: "100%",
+      marginTop: 20,
+      textAlign: "center",
+    },
   }));
 
   const classes = useStyles();
 
   if (!coin) return <LinearProgress style={{ backgroundColor: "gold" }} />;
+
+  // Calcul de la position de la jauge
+  const low24h = coin?.market_data.low_24h[currency.toLowerCase()];
+  const high24h = coin?.market_data.high_24h[currency.toLowerCase()];
+  const currentPrice = coin?.market_data.current_price[currency.toLowerCase()];
+  const gaugePosition = ((currentPrice - low24h) / (high24h - low24h)) * 100;
 
   return (
     <div className={classes.container}>
@@ -100,56 +109,91 @@ const CoinPage = () => {
         <div className={classes.marketData}>
           <span style={{ display: "flex" }}>
             <Typography variant="h5" className={classes.heading}>
-              Rank:
+              Rang:
             </Typography>
             &nbsp; &nbsp;
-            <Typography
-              variant="h5"
-              style={{
-                fontFamily: "Montserrat",
-              }}
-            >
+            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
               {numberWithCommas(coin?.market_cap_rank)}
             </Typography>
           </span>
 
           <span style={{ display: "flex" }}>
             <Typography variant="h5" className={classes.heading}>
-              Current Price:
+              Prix Actuel:
             </Typography>
             &nbsp; &nbsp;
-            <Typography
-              variant="h5"
-              style={{
-                fontFamily: "Montserrat",
-              }}
-            >
-              {symbol}{" "}
-              {numberWithCommas(
-                coin?.market_data.current_price[currency.toLowerCase()]
-              )}
+            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
+              {symbol} {numberWithCommas(currentPrice)} €
             </Typography>
           </span>
+
           <span style={{ display: "flex" }}>
             <Typography variant="h5" className={classes.heading}>
-              Market Cap:
+              Capitalisation:
             </Typography>
             &nbsp; &nbsp;
-            <Typography
-              variant="h5"
-              style={{
-                fontFamily: "Montserrat",
-              }}
-            >
+            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
               {symbol}{" "}
               {numberWithCommas(
                 coin?.market_data.market_cap[currency.toLowerCase()]
                   .toString()
                   .slice(0, -6)
               )}
-              M
+              M €
             </Typography>
           </span>
+
+          <span style={{ display: "flex" }}>
+            <Typography variant="h5" className={classes.heading}>
+              ATH:
+            </Typography>
+            &nbsp; &nbsp;
+            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
+              {symbol} {numberWithCommas(coin?.market_data.ath[currency.toLowerCase()])} €
+            </Typography>
+          </span>
+
+          <span style={{ display: "flex" }}>
+            <Typography variant="h5" className={classes.heading}>
+              ATL:
+            </Typography>
+            &nbsp; &nbsp;
+            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
+              {symbol} {numberWithCommas(coin?.market_data.atl[currency.toLowerCase()])} €
+            </Typography>
+          </span>
+
+          <span style={{ display: "flex" }}>
+            <Typography variant="h5" className={classes.heading}>
+              Volume (24h):
+            </Typography>
+            &nbsp; &nbsp;
+            <Typography variant="h5" style={{ fontFamily: "Montserrat" }}>
+              {symbol} {numberWithCommas(coin?.market_data.total_volume[currency.toLowerCase()])} €
+            </Typography>
+          </span>
+
+          {/* Jauge ATH */}
+          <Box className={classes.gaugeContainer}>
+            <Typography variant="h5" className={classes.heading}>
+              Price Range (24h):
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Low: {symbol} {numberWithCommas(low24h)} € - High: {symbol} {numberWithCommas(high24h)} €
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={gaugePosition}
+              style={{
+                height: 10,
+                borderRadius: 5,
+                backgroundColor: "orange",
+              }}
+            />
+            <Typography variant="body2" style={{ marginTop: 5 }}>
+              Prix Actuel: {symbol} {numberWithCommas(currentPrice)} €
+            </Typography>
+          </Box>
         </div>
       </div>
       <CoinInfo coin={coin} />

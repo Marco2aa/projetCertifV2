@@ -32,6 +32,7 @@ const CoinInfo = ({ coin }) => {
 
   useEffect(() => {
     fetchHistoricData(coin.id, days, currency);
+    console.log(coin)
   }, [currency, days]);
 
   const useStyles = makeStyles(() => ({
