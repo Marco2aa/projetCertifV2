@@ -21,6 +21,7 @@ const PortfolioPieChart = () => {
             });
             setPortfolioData(response.data);
             setLoading(false);
+            console.log(portfolioData)
         } catch (err) {
             console.error("Erreur lors de la récupération des données du portefeuille:", err);
             setError('Erreur lors de la récupération des données');

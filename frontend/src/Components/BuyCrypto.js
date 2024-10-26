@@ -154,13 +154,22 @@ export default function BuyCrypto() {
 
     const handleSellCrypto = async () => {
         const token = localStorage.getItem('jwtToken');
+        const decodedToken = decodeJWT(token);
+        const username = decodedToken.username;
+        setUsername(username);
+        const cryptoName = selectedCryptoSell.label.split(" - ")[0];
         try {
             const response = await axios.post(
-                `${BASE_URL}/api/create-sell-order`,
+                `${BASE_URL}/api/sellorder`,
                 {
-                    cryptoId: selectedCrypto.id,
-                    walletId: selectedWallet.id,
-                    quantity: amountToSell,
+                    type: 'Vente',
+                    cryptoId: cryptoName,
+                    walletId: parseInt(thisWallet.id),
+                    quantity: ((selectedPercentageSell / 100) * portfolioData.cryptoTotals[selectedCryptoSell.value]).toFixed(2),
+                    userId: username,
+                    cryptoValue: (portfolioData.cryptoTotals[selectedCryptoSell.value] / portfolioData.cryptoByToken[selectedCryptoSell.value]).toFixed(2),
+
+
                 },
                 {
                     headers: {
@@ -371,6 +380,59 @@ export default function BuyCrypto() {
         }
     };
 
+    const [portfolioData, setPortfolioData] = useState({
+        cryptoTotals: {},
+        cryptoByToken: {},
+        fiatBalance: 0,
+    });
+
+    // Fonction pour récupérer les données du portfolio
+    const fetchPortfolioData = async () => {
+        try {
+            const token = localStorage.getItem('jwtToken')
+            const response = await axios.get(`${BASE_URL}/api/portfolio`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json'
+                }
+            });
+            const data = response.data;
+            setPortfolioData({
+                cryptoTotals: data.cryptoTotals,
+                cryptoByToken: data.cryptoByToken,
+                fiatBalance: data.fiatBalance,
+            });
+            console.log(portfolioData)
+        } catch (error) {
+            console.error('Erreur lors de la récupération des données du portfolio:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchPortfolioData();
+    }, [selectedWallet]);
+
+    // Options pour l'Autocomplete
+    const cryptoOptions = Object.keys(portfolioData.cryptoTotals).map((crypto) => ({
+        label: `${crypto} - Quantité: ${portfolioData.cryptoByToken[crypto].toFixed(4)}`,
+        value: crypto,
+    }));
+
+    const [selectedCryptoSell, setSelectedCryptoSell] = useState(null);
+
+    const selectedCryptoValueSell = selectedCryptoSell
+        ? portfolioData.cryptoTotals[selectedCryptoSell.value].toFixed(2)
+        : null;
+
+    const [selectedPercentageSell, setSelectedPercentageSell] = useState(30);
+
+
+    const handlePercentageChangeSell = (event, newValue) => {
+        setSelectedPercentageSell(newValue);
+    };
+
+
+
     return (
         <Box sx={{
             display: 'flex',
@@ -539,17 +601,7 @@ export default function BuyCrypto() {
                                 </>
                             }
 
-                            <div style={{ display: 'flex', flexDirection: 'row', margin: 'auto', gap: '20px' }}>
-                                <p style={{ fontWeight: 600, fontFamily: 'Poppins', justifyContent: 'space-around' }}>
-                                    {thisWallet ? 'Portefeuille : ' + thisWallet.name : ''}
 
-                                </p>
-                                <p>|</p>
-                                <p style={{ fontWeight: 600, fontFamily: 'Poppins', margin: 'auto' }}>
-                                    {thisWallet ? 'Solde : ' + thisWallet.solde + ' €' : ''}
-
-                                </p>
-                            </div>
                             <button
                                 onClick={() => handleBuyDeposit()}
                                 className={classes.button}
@@ -558,35 +610,62 @@ export default function BuyCrypto() {
                     </TabPanel>
                     <TabPanel value={value} index={1} dir={theme.direction}>
                         <Box>
-                            <SelectWallet wallets={wallet} onSelect={handleSelectWallet} />
-
+                            <div style={{
+                                display: "flex",
+                                width: "100%",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}>
+                                <SelectWallet wallets={wallet} onSelect={handleSelectWallet} />
+                            </div>
                             {/* Autocomplete pour choisir la crypto à vendre */}
-                            <Autocomplete
-                                options={availableCryptos}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, newValue) => {
-                                    setSelectedCrypto(newValue);
-                                    setMaxAmount(newValue.balance); // Mettre à jour le montant maximum vendable
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Cryptos disponibles" />}
-                            />
 
-                            <TextField
-                                label="Quantité à vendre"
-                                type="number"
-                                value={amountToSell}
-                                onChange={(e) => {
-                                    const value = parseFloat(e.target.value);
-                                    setAmountToSell(value);
-                                    setError(value > maxAmount);
-                                }}
-                                error={error}
-                                helperText={error ? `Vous ne pouvez pas vendre plus de ${maxAmount}` : ''}
-                            />
+                            <Box sx={{ p: 3 }}>
+                                {/* Affichage du solde fiat */}
 
-                            <Button onClick={handleSellCrypto} disabled={error || !amountToSell}>
-                                Vendre
-                            </Button>
+                                {/* Autocomplete pour les cryptos possédées */}
+                                <Autocomplete
+                                    options={cryptoOptions}
+                                    sx={{ marginBottom: 3 }}
+                                    getOptionLabel={(option) => option.label}
+                                    onChange={(event, newValue) => setSelectedCryptoSell(newValue)}
+                                    renderInput={(params) => (
+                                        <TextField {...params} label="Rechercher une crypto" variant="outlined" />
+                                    )}
+                                    renderOption={(props, option) => (
+                                        <li {...props} key={option.value}>
+                                            {option.label}
+                                        </li>
+                                    )}
+                                />
+                                {selectedCryptoSell && (
+                                    <>
+                                        <Typography variant="body1" sx={{ mt: 2 }}>
+                                            Valeur de {selectedCryptoSell.value} en euros : {selectedCryptoValueSell} €
+                                        </Typography>
+                                        <Slider
+                                            value={selectedPercentageSell}
+                                            onChange={handlePercentageChangeSell}
+                                            aria-label="Pourcentage de crypto"
+                                            defaultValue={30}
+                                            color="warning"
+                                            valueLabelDisplay="auto"
+                                            step={10}
+                                            marks
+                                            min={0}
+                                            max={100}
+                                            sx={{ mt: 2 }} // Ajout d'un peu d'espace au-dessus du slider
+                                        />
+                                        <Typography variant="body1" sx={{ mt: 2, mb: 3 }}>
+                                            Quantité sélectionnée : {((selectedPercentageSell / 100) * portfolioData.cryptoTotals[selectedCryptoSell.value]).toFixed(2)} EUR
+                                        </Typography>
+                                    </>
+                                )}
+                                <button
+                                    onClick={() => handleSellCrypto()}
+                                    className={classes.button}
+                                >Vendre</button>
+                            </Box>
                         </Box>
                     </TabPanel>
                 </SwipeableViews>

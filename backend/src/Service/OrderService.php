@@ -209,4 +209,54 @@ class OrderService
             'fiatBalance' => $fiatBalance, // Le solde en euros
         ];
     }
+
+    public function createSaleOrder(
+        string $type,
+        float $quantity,
+        \DateTimeImmutable $createdAt,
+        $walletId,
+        $user,
+        $deviseId,
+        $deviseValue,
+        float $cryptoValue = null,
+        $cryptoId = null
+    ) {
+        // Récupérer le portefeuille et l'utilisateur
+        $wallet = $this->walletRepository->find($walletId);
+
+
+
+        $devise = $this->deviseRepository->findOneBy(['id' => $deviseId]);
+
+
+        if ($cryptoId) {
+            $crypto = $this->cryptoRepository->find($cryptoId);
+        } else {
+            $crypto = null;
+        }
+
+        // Créer une nouvelle commande
+        $order = new Order();
+        $order->setType($type); // Doit être 'Vente'
+        $order->setQuantity($quantity);
+        $order->setCreatedAt($createdAt);
+        $order->setWallet($wallet);
+        $order->setDevise($devise);
+        $order->setUser($user); // Associer l'utilisateur à l'ordre
+        $order->setCrypto($crypto);
+
+        // Ajouter la valeur de la devise et de la crypto au moment de l'ordre
+
+        $order->setDeviseValue($deviseValue);
+
+        if ($cryptoValue !== null) {
+            $order->setCryptoPriceAtTransaction($cryptoValue);
+        }
+
+        // Enregistrer l'ordre dans la base de données
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
+
+        return $order;
+    }
 }
